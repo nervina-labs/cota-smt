@@ -7,6 +7,7 @@ pub mod common;
 pub mod define;
 pub mod mint;
 pub mod registry;
+pub mod smt;
 pub mod transfer;
 pub mod update;
 
