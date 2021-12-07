@@ -1,0 +1,33 @@
+// Uint16/Uint32: big endian
+
+array Byte32 [byte; 32];
+array Uint16 [byte; 2];
+array Uint32 [byte; 4];
+vector Bytes <byte>;
+
+array CotaId [byte; 20];
+array Characteristic [byte; 20];
+array OutPointSlice [byte; 24];
+array LockHashSlice [byte; 20];
+
+struct CotaNFTId {
+  smt_type: Uint16,
+  cota_id: CotaId,
+  index: Uint32,
+}
+
+struct CotaNFTInfo {
+  configure: byte,
+  state: byte,
+  characteristic: Characteristic,
+}
+
+vector HoldCotaNFTKeyVec <CotaNFTId>;
+
+vector HoldCotaNFTValueVec <CotaNFTInfo>;
+
+table HoldCotaNFTEntries {
+  keys: HoldCotaNFTKeyVec,
+  values: HoldCotaNFTValueVec,
+  proof: Bytes,
+}

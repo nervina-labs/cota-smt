@@ -1,0 +1,13 @@
+import common;
+
+struct Registry {
+  lock_hash: Byte32,
+  state: Byte32,
+}
+
+vector RegistryVec <Registry>;
+
+table CotaNFTRegistryEntries {
+  registries: RegistryVec,
+  proof: Bytes,
+}

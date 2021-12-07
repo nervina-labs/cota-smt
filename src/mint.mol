@@ -1,0 +1,20 @@
+import common;
+
+vector MintCotaNFTKeyVec <CotaNFTId>;
+
+table MintCotaNFTValue {
+  nft_info: CotaNFTInfo,
+  to: LockHashSlice,
+  out_point: OutPointSlice,
+}
+
+vector MintCotaNFTValueVec <MintCotaNFTValue>;
+
+table MintCotaNFTEntries {
+  hold_keys: HoldCotaNFTKeyVec,
+  hold_values: HoldCotaNFTValueVec,
+  mint_keys: MintCotaNFTKeyVec,
+  mint_values: MintCotaNFTValueVec,
+  proof: Bytes,
+  action: Bytes,
+}

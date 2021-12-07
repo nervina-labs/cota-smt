@@ -1,0 +1,40 @@
+import common;
+
+vector WithdrawalCotaNFTKeyVec <CotaNFTId>;
+
+table WithdrawalCotaNFTValue {
+  nft_info: CotaNFTInfo,
+  to: LockHashSlice,
+  out_point: OutPointSlice,
+}
+
+vector WithdrawalCotaNFTValueVec <WithdrawalCotaNFTValue>;
+
+table WithdrawalCotaNFTEntries {
+  hold_keys: HoldCotaNFTKeyVec,
+  hold_values: HoldCotaNFTValueVec,
+  withdrawal_keys: WithdrawalCotaNFTKeyVec,
+  withdrawal_values: WithdrawalCotaNFTValueVec,
+  proof: Bytes,
+  action: Bytes,
+}
+
+
+table ClaimCotaNFTKey {
+  nft_info: CotaNFTInfo,
+  out_point: OutPointSlice,
+}
+
+vector ClaimCotaNFTKeyVec <ClaimCotaNFTKey>;
+
+vector ClaimCotaNFTValueVec <Byte32>;
+
+table ClaimCotaNFTEntries {
+  hold_keys: HoldCotaNFTKeyVec,
+  hold_values: HoldCotaNFTValueVec,
+  claim_keys: ClaimCotaNFTKeyVec,
+  claim_values: ClaimCotaNFTValueVec,
+  proof: Bytes,
+  withdrawal_proof: Bytes,
+  action: Bytes,
+}
