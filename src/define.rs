@@ -1229,7 +1229,8 @@ impl ::core::fmt::Display for DefineCotaNFTEntries {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "define_keys", self.define_keys())?;
-        write!(f, ", {}: {}", "define_values", self.define_values())?;
+        write!(f, ", {}: {}", "define_old_values", self.define_old_values())?;
+        write!(f, ", {}: {}", "define_new_values", self.define_new_values())?;
         write!(f, ", {}: {}", "hold_keys", self.hold_keys())?;
         write!(f, ", {}: {}", "hold_values", self.hold_values())?;
         write!(f, ", {}: {}", "proof", self.proof())?;
@@ -1244,14 +1245,15 @@ impl ::core::fmt::Display for DefineCotaNFTEntries {
 impl ::core::default::Default for DefineCotaNFTEntries {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            52, 0, 0, 0, 28, 0, 0, 0, 32, 0, 0, 0, 36, 0, 0, 0, 40, 0, 0, 0, 44, 0, 0, 0, 48, 0, 0,
-            0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            60, 0, 0, 0, 32, 0, 0, 0, 36, 0, 0, 0, 40, 0, 0, 0, 44, 0, 0, 0, 48, 0, 0, 0, 52, 0, 0,
+            0, 56, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0,
         ];
         DefineCotaNFTEntries::new_unchecked(v.into())
     }
 }
 impl DefineCotaNFTEntries {
-    pub const FIELD_COUNT: usize = 6;
+    pub const FIELD_COUNT: usize = 7;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -1280,39 +1282,46 @@ impl DefineCotaNFTEntries {
         DefineCotaNFTKeyVec::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn define_values(&self) -> DefineCotaNFTValueVec {
+    pub fn define_old_values(&self) -> DefineCotaNFTValueVec {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[8..]) as usize;
         let end = molecule::unpack_number(&slice[12..]) as usize;
         DefineCotaNFTValueVec::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn hold_keys(&self) -> HoldCotaNFTKeyVec {
+    pub fn define_new_values(&self) -> DefineCotaNFTValueVec {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
         let end = molecule::unpack_number(&slice[16..]) as usize;
+        DefineCotaNFTValueVec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn hold_keys(&self) -> HoldCotaNFTKeyVec {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
+        let end = molecule::unpack_number(&slice[20..]) as usize;
         HoldCotaNFTKeyVec::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn hold_values(&self) -> HoldCotaNFTValueVec {
         let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[16..]) as usize;
-        let end = molecule::unpack_number(&slice[20..]) as usize;
+        let start = molecule::unpack_number(&slice[20..]) as usize;
+        let end = molecule::unpack_number(&slice[24..]) as usize;
         HoldCotaNFTValueVec::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn proof(&self) -> Bytes {
         let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[20..]) as usize;
-        let end = molecule::unpack_number(&slice[24..]) as usize;
+        let start = molecule::unpack_number(&slice[24..]) as usize;
+        let end = molecule::unpack_number(&slice[28..]) as usize;
         Bytes::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn action(&self) -> Bytes {
         let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[24..]) as usize;
+        let start = molecule::unpack_number(&slice[28..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[28..]) as usize;
+            let end = molecule::unpack_number(&slice[32..]) as usize;
             Bytes::new_unchecked(self.0.slice(start..end))
         } else {
             Bytes::new_unchecked(self.0.slice(start..))
@@ -1355,7 +1364,8 @@ impl molecule::prelude::Entity for DefineCotaNFTEntries {
     fn as_builder(self) -> Self::Builder {
         Self::new_builder()
             .define_keys(self.define_keys())
-            .define_values(self.define_values())
+            .define_old_values(self.define_old_values())
+            .define_new_values(self.define_new_values())
             .hold_keys(self.hold_keys())
             .hold_values(self.hold_values())
             .proof(self.proof())
@@ -1382,7 +1392,8 @@ impl<'r> ::core::fmt::Display for DefineCotaNFTEntriesReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "define_keys", self.define_keys())?;
-        write!(f, ", {}: {}", "define_values", self.define_values())?;
+        write!(f, ", {}: {}", "define_old_values", self.define_old_values())?;
+        write!(f, ", {}: {}", "define_new_values", self.define_new_values())?;
         write!(f, ", {}: {}", "hold_keys", self.hold_keys())?;
         write!(f, ", {}: {}", "hold_values", self.hold_values())?;
         write!(f, ", {}: {}", "proof", self.proof())?;
@@ -1395,7 +1406,7 @@ impl<'r> ::core::fmt::Display for DefineCotaNFTEntriesReader<'r> {
     }
 }
 impl<'r> DefineCotaNFTEntriesReader<'r> {
-    pub const FIELD_COUNT: usize = 6;
+    pub const FIELD_COUNT: usize = 7;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -1424,39 +1435,46 @@ impl<'r> DefineCotaNFTEntriesReader<'r> {
         DefineCotaNFTKeyVecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn define_values(&self) -> DefineCotaNFTValueVecReader<'r> {
+    pub fn define_old_values(&self) -> DefineCotaNFTValueVecReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[8..]) as usize;
         let end = molecule::unpack_number(&slice[12..]) as usize;
         DefineCotaNFTValueVecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn hold_keys(&self) -> HoldCotaNFTKeyVecReader<'r> {
+    pub fn define_new_values(&self) -> DefineCotaNFTValueVecReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
         let end = molecule::unpack_number(&slice[16..]) as usize;
+        DefineCotaNFTValueVecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn hold_keys(&self) -> HoldCotaNFTKeyVecReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
+        let end = molecule::unpack_number(&slice[20..]) as usize;
         HoldCotaNFTKeyVecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
     pub fn hold_values(&self) -> HoldCotaNFTValueVecReader<'r> {
         let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[16..]) as usize;
-        let end = molecule::unpack_number(&slice[20..]) as usize;
+        let start = molecule::unpack_number(&slice[20..]) as usize;
+        let end = molecule::unpack_number(&slice[24..]) as usize;
         HoldCotaNFTValueVecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
     pub fn proof(&self) -> BytesReader<'r> {
         let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[20..]) as usize;
-        let end = molecule::unpack_number(&slice[24..]) as usize;
+        let start = molecule::unpack_number(&slice[24..]) as usize;
+        let end = molecule::unpack_number(&slice[28..]) as usize;
         BytesReader::new_unchecked(&self.as_slice()[start..end])
     }
 
     pub fn action(&self) -> BytesReader<'r> {
         let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[24..]) as usize;
+        let start = molecule::unpack_number(&slice[28..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[28..]) as usize;
+            let end = molecule::unpack_number(&slice[32..]) as usize;
             BytesReader::new_unchecked(&self.as_slice()[start..end])
         } else {
             BytesReader::new_unchecked(&self.as_slice()[start..])
@@ -1519,32 +1537,39 @@ impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTEntriesReader<'r> {
         }
         DefineCotaNFTKeyVecReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
         DefineCotaNFTValueVecReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
-        HoldCotaNFTKeyVecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
-        HoldCotaNFTValueVecReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
-        BytesReader::verify(&slice[offsets[4]..offsets[5]], compatible)?;
+        DefineCotaNFTValueVecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
+        HoldCotaNFTKeyVecReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
+        HoldCotaNFTValueVecReader::verify(&slice[offsets[4]..offsets[5]], compatible)?;
         BytesReader::verify(&slice[offsets[5]..offsets[6]], compatible)?;
+        BytesReader::verify(&slice[offsets[6]..offsets[7]], compatible)?;
         Ok(())
     }
 }
 #[derive(Debug, Default)]
 pub struct DefineCotaNFTEntriesBuilder {
-    pub(crate) define_keys:   DefineCotaNFTKeyVec,
-    pub(crate) define_values: DefineCotaNFTValueVec,
-    pub(crate) hold_keys:     HoldCotaNFTKeyVec,
-    pub(crate) hold_values:   HoldCotaNFTValueVec,
-    pub(crate) proof:         Bytes,
-    pub(crate) action:        Bytes,
+    pub(crate) define_keys:       DefineCotaNFTKeyVec,
+    pub(crate) define_old_values: DefineCotaNFTValueVec,
+    pub(crate) define_new_values: DefineCotaNFTValueVec,
+    pub(crate) hold_keys:         HoldCotaNFTKeyVec,
+    pub(crate) hold_values:       HoldCotaNFTValueVec,
+    pub(crate) proof:             Bytes,
+    pub(crate) action:            Bytes,
 }
 impl DefineCotaNFTEntriesBuilder {
-    pub const FIELD_COUNT: usize = 6;
+    pub const FIELD_COUNT: usize = 7;
 
     pub fn define_keys(mut self, v: DefineCotaNFTKeyVec) -> Self {
         self.define_keys = v;
         self
     }
 
-    pub fn define_values(mut self, v: DefineCotaNFTValueVec) -> Self {
-        self.define_values = v;
+    pub fn define_old_values(mut self, v: DefineCotaNFTValueVec) -> Self {
+        self.define_old_values = v;
+        self
+    }
+
+    pub fn define_new_values(mut self, v: DefineCotaNFTValueVec) -> Self {
+        self.define_new_values = v;
         self
     }
 
@@ -1576,7 +1601,8 @@ impl molecule::prelude::Builder for DefineCotaNFTEntriesBuilder {
     fn expected_length(&self) -> usize {
         molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
             + self.define_keys.as_slice().len()
-            + self.define_values.as_slice().len()
+            + self.define_old_values.as_slice().len()
+            + self.define_new_values.as_slice().len()
             + self.hold_keys.as_slice().len()
             + self.hold_values.as_slice().len()
             + self.proof.as_slice().len()
@@ -1589,7 +1615,9 @@ impl molecule::prelude::Builder for DefineCotaNFTEntriesBuilder {
         offsets.push(total_size);
         total_size += self.define_keys.as_slice().len();
         offsets.push(total_size);
-        total_size += self.define_values.as_slice().len();
+        total_size += self.define_old_values.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.define_new_values.as_slice().len();
         offsets.push(total_size);
         total_size += self.hold_keys.as_slice().len();
         offsets.push(total_size);
@@ -1603,7 +1631,8 @@ impl molecule::prelude::Builder for DefineCotaNFTEntriesBuilder {
             writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
         }
         writer.write_all(self.define_keys.as_slice())?;
-        writer.write_all(self.define_values.as_slice())?;
+        writer.write_all(self.define_old_values.as_slice())?;
+        writer.write_all(self.define_new_values.as_slice())?;
         writer.write_all(self.hold_keys.as_slice())?;
         writer.write_all(self.hold_values.as_slice())?;
         writer.write_all(self.proof.as_slice())?;
