@@ -21,7 +21,7 @@ table WithdrawalCotaNFTEntries {
 
 
 table ClaimCotaNFTKey {
-  nft_info: CotaNFTInfo,
+  nft_id: CotaNFTId,
   out_point: OutPointSlice,
 }
 

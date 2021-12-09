@@ -1451,7 +1451,7 @@ impl ::core::fmt::Debug for ClaimCotaNFTKey {
 impl ::core::fmt::Display for ClaimCotaNFTKey {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "nft_info", self.nft_info())?;
+        write!(f, "{}: {}", "nft_id", self.nft_id())?;
         write!(f, ", {}: {}", "out_point", self.out_point())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -1463,9 +1463,9 @@ impl ::core::fmt::Display for ClaimCotaNFTKey {
 impl ::core::default::Default for ClaimCotaNFTKey {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            58, 0, 0, 0, 12, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            62, 0, 0, 0, 12, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0,
+            0, 0, 0, 0, 0,
         ];
         ClaimCotaNFTKey::new_unchecked(v.into())
     }
@@ -1493,11 +1493,11 @@ impl ClaimCotaNFTKey {
         Self::FIELD_COUNT != self.field_count()
     }
 
-    pub fn nft_info(&self) -> CotaNFTInfo {
+    pub fn nft_id(&self) -> CotaNFTId {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[4..]) as usize;
         let end = molecule::unpack_number(&slice[8..]) as usize;
-        CotaNFTInfo::new_unchecked(self.0.slice(start..end))
+        CotaNFTId::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn out_point(&self) -> OutPointSlice {
@@ -1546,7 +1546,7 @@ impl molecule::prelude::Entity for ClaimCotaNFTKey {
 
     fn as_builder(self) -> Self::Builder {
         Self::new_builder()
-            .nft_info(self.nft_info())
+            .nft_id(self.nft_id())
             .out_point(self.out_point())
     }
 }
@@ -1569,7 +1569,7 @@ impl<'r> ::core::fmt::Debug for ClaimCotaNFTKeyReader<'r> {
 impl<'r> ::core::fmt::Display for ClaimCotaNFTKeyReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "nft_info", self.nft_info())?;
+        write!(f, "{}: {}", "nft_id", self.nft_id())?;
         write!(f, ", {}: {}", "out_point", self.out_point())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -1601,11 +1601,11 @@ impl<'r> ClaimCotaNFTKeyReader<'r> {
         Self::FIELD_COUNT != self.field_count()
     }
 
-    pub fn nft_info(&self) -> CotaNFTInfoReader<'r> {
+    pub fn nft_id(&self) -> CotaNFTIdReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[4..]) as usize;
         let end = molecule::unpack_number(&slice[8..]) as usize;
-        CotaNFTInfoReader::new_unchecked(&self.as_slice()[start..end])
+        CotaNFTIdReader::new_unchecked(&self.as_slice()[start..end])
     }
 
     pub fn out_point(&self) -> OutPointSliceReader<'r> {
@@ -1673,21 +1673,21 @@ impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTKeyReader<'r> {
         if offsets.windows(2).any(|i| i[0] > i[1]) {
             return ve!(Self, OffsetsNotMatch);
         }
-        CotaNFTInfoReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
+        CotaNFTIdReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
         OutPointSliceReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
         Ok(())
     }
 }
 #[derive(Debug, Default)]
 pub struct ClaimCotaNFTKeyBuilder {
-    pub(crate) nft_info:  CotaNFTInfo,
+    pub(crate) nft_id:    CotaNFTId,
     pub(crate) out_point: OutPointSlice,
 }
 impl ClaimCotaNFTKeyBuilder {
     pub const FIELD_COUNT: usize = 2;
 
-    pub fn nft_info(mut self, v: CotaNFTInfo) -> Self {
-        self.nft_info = v;
+    pub fn nft_id(mut self, v: CotaNFTId) -> Self {
+        self.nft_id = v;
         self
     }
 
@@ -1703,7 +1703,7 @@ impl molecule::prelude::Builder for ClaimCotaNFTKeyBuilder {
 
     fn expected_length(&self) -> usize {
         molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
-            + self.nft_info.as_slice().len()
+            + self.nft_id.as_slice().len()
             + self.out_point.as_slice().len()
     }
 
@@ -1711,14 +1711,14 @@ impl molecule::prelude::Builder for ClaimCotaNFTKeyBuilder {
         let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
         let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
         offsets.push(total_size);
-        total_size += self.nft_info.as_slice().len();
+        total_size += self.nft_id.as_slice().len();
         offsets.push(total_size);
         total_size += self.out_point.as_slice().len();
         writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
         for offset in offsets.into_iter() {
             writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
         }
-        writer.write_all(self.nft_info.as_slice())?;
+        writer.write_all(self.nft_id.as_slice())?;
         writer.write_all(self.out_point.as_slice())?;
         Ok(())
     }
