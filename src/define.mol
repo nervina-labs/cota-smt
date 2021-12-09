@@ -1,9 +1,11 @@
 import common;
 
-struct DefineCotaNFTKey {
+struct DefineCotaNFTId {
   smt_type: Uint16,
   cota_id: CotaId,
 }
+
+vector DefineCotaNFTKeyVec <DefineCotaNFTId>;
 
 table DefineCotaNFTValue {
   total: Uint32,
@@ -11,10 +13,12 @@ table DefineCotaNFTValue {
   configure: byte,
 }
 
+vector DefineCotaNFTValueVec <DefineCotaNFTValue>;
+
 table DefineCotaNFTEntries {
-  define_key: DefineCotaNFTKey,
-  define_old_value: DefineCotaNFTValue,
-  define_new_value: DefineCotaNFTValue,
+  define_keys: DefineCotaNFTKeyVec,
+  define_old_values: DefineCotaNFTValueVec,
+  define_new_values: DefineCotaNFTValueVec,
   hold_keys: HoldCotaNFTKeyVec,
   hold_values: HoldCotaNFTValueVec,
   proof: Bytes,

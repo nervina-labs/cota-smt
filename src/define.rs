@@ -14,8 +14,8 @@ pub use alloc::vec::*;
 use super::common::*;
 use molecule::prelude::*;
 #[derive(Clone)]
-pub struct DefineCotaNFTKey(molecule::bytes::Bytes);
-impl ::core::fmt::LowerHex for DefineCotaNFTKey {
+pub struct DefineCotaNFTId(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for DefineCotaNFTId {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
         if f.alternate() {
@@ -24,12 +24,12 @@ impl ::core::fmt::LowerHex for DefineCotaNFTKey {
         write!(f, "{}", hex_string(self.as_slice()))
     }
 }
-impl ::core::fmt::Debug for DefineCotaNFTKey {
+impl ::core::fmt::Debug for DefineCotaNFTId {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:#x})", Self::NAME, self)
     }
 }
-impl ::core::fmt::Display for DefineCotaNFTKey {
+impl ::core::fmt::Display for DefineCotaNFTId {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "smt_type", self.smt_type())?;
@@ -37,15 +37,15 @@ impl ::core::fmt::Display for DefineCotaNFTKey {
         write!(f, " }}")
     }
 }
-impl ::core::default::Default for DefineCotaNFTKey {
+impl ::core::default::Default for DefineCotaNFTId {
     fn default() -> Self {
         let v: Vec<u8> = vec![
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
-        DefineCotaNFTKey::new_unchecked(v.into())
+        DefineCotaNFTId::new_unchecked(v.into())
     }
 }
-impl DefineCotaNFTKey {
+impl DefineCotaNFTId {
     pub const FIELD_COUNT: usize = 2;
     pub const FIELD_SIZES: [usize; 2] = [2, 20];
     pub const TOTAL_SIZE: usize = 22;
@@ -58,17 +58,17 @@ impl DefineCotaNFTKey {
         CotaId::new_unchecked(self.0.slice(2..22))
     }
 
-    pub fn as_reader<'r>(&'r self) -> DefineCotaNFTKeyReader<'r> {
-        DefineCotaNFTKeyReader::new_unchecked(self.as_slice())
+    pub fn as_reader<'r>(&'r self) -> DefineCotaNFTIdReader<'r> {
+        DefineCotaNFTIdReader::new_unchecked(self.as_slice())
     }
 }
-impl molecule::prelude::Entity for DefineCotaNFTKey {
-    type Builder = DefineCotaNFTKeyBuilder;
+impl molecule::prelude::Entity for DefineCotaNFTId {
+    type Builder = DefineCotaNFTIdBuilder;
 
-    const NAME: &'static str = "DefineCotaNFTKey";
+    const NAME: &'static str = "DefineCotaNFTId";
 
     fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
-        DefineCotaNFTKey(data)
+        DefineCotaNFTId(data)
     }
 
     fn as_bytes(&self) -> molecule::bytes::Bytes {
@@ -80,11 +80,11 @@ impl molecule::prelude::Entity for DefineCotaNFTKey {
     }
 
     fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
-        DefineCotaNFTKeyReader::from_slice(slice).map(|reader| reader.to_entity())
+        DefineCotaNFTIdReader::from_slice(slice).map(|reader| reader.to_entity())
     }
 
     fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
-        DefineCotaNFTKeyReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+        DefineCotaNFTIdReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
     }
 
     fn new_builder() -> Self::Builder {
@@ -98,8 +98,8 @@ impl molecule::prelude::Entity for DefineCotaNFTKey {
     }
 }
 #[derive(Clone, Copy)]
-pub struct DefineCotaNFTKeyReader<'r>(&'r [u8]);
-impl<'r> ::core::fmt::LowerHex for DefineCotaNFTKeyReader<'r> {
+pub struct DefineCotaNFTIdReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for DefineCotaNFTIdReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
         if f.alternate() {
@@ -108,12 +108,12 @@ impl<'r> ::core::fmt::LowerHex for DefineCotaNFTKeyReader<'r> {
         write!(f, "{}", hex_string(self.as_slice()))
     }
 }
-impl<'r> ::core::fmt::Debug for DefineCotaNFTKeyReader<'r> {
+impl<'r> ::core::fmt::Debug for DefineCotaNFTIdReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:#x})", Self::NAME, self)
     }
 }
-impl<'r> ::core::fmt::Display for DefineCotaNFTKeyReader<'r> {
+impl<'r> ::core::fmt::Display for DefineCotaNFTIdReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "smt_type", self.smt_type())?;
@@ -121,7 +121,7 @@ impl<'r> ::core::fmt::Display for DefineCotaNFTKeyReader<'r> {
         write!(f, " }}")
     }
 }
-impl<'r> DefineCotaNFTKeyReader<'r> {
+impl<'r> DefineCotaNFTIdReader<'r> {
     pub const FIELD_COUNT: usize = 2;
     pub const FIELD_SIZES: [usize; 2] = [2, 20];
     pub const TOTAL_SIZE: usize = 22;
@@ -134,17 +134,17 @@ impl<'r> DefineCotaNFTKeyReader<'r> {
         CotaIdReader::new_unchecked(&self.as_slice()[2..22])
     }
 }
-impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTKeyReader<'r> {
-    type Entity = DefineCotaNFTKey;
+impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTIdReader<'r> {
+    type Entity = DefineCotaNFTId;
 
-    const NAME: &'static str = "DefineCotaNFTKeyReader";
+    const NAME: &'static str = "DefineCotaNFTIdReader";
 
     fn to_entity(&self) -> Self::Entity {
         Self::Entity::new_unchecked(self.as_slice().to_owned().into())
     }
 
     fn new_unchecked(slice: &'r [u8]) -> Self {
-        DefineCotaNFTKeyReader(slice)
+        DefineCotaNFTIdReader(slice)
     }
 
     fn as_slice(&self) -> &'r [u8] {
@@ -161,11 +161,11 @@ impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTKeyReader<'r> {
     }
 }
 #[derive(Debug, Default)]
-pub struct DefineCotaNFTKeyBuilder {
+pub struct DefineCotaNFTIdBuilder {
     pub(crate) smt_type: Uint16,
     pub(crate) cota_id:  CotaId,
 }
-impl DefineCotaNFTKeyBuilder {
+impl DefineCotaNFTIdBuilder {
     pub const FIELD_COUNT: usize = 2;
     pub const FIELD_SIZES: [usize; 2] = [2, 20];
     pub const TOTAL_SIZE: usize = 22;
@@ -180,10 +180,10 @@ impl DefineCotaNFTKeyBuilder {
         self
     }
 }
-impl molecule::prelude::Builder for DefineCotaNFTKeyBuilder {
-    type Entity = DefineCotaNFTKey;
+impl molecule::prelude::Builder for DefineCotaNFTIdBuilder {
+    type Entity = DefineCotaNFTId;
 
-    const NAME: &'static str = "DefineCotaNFTKeyBuilder";
+    const NAME: &'static str = "DefineCotaNFTIdBuilder";
 
     fn expected_length(&self) -> usize {
         Self::TOTAL_SIZE
@@ -199,7 +199,316 @@ impl molecule::prelude::Builder for DefineCotaNFTKeyBuilder {
         let mut inner = Vec::with_capacity(self.expected_length());
         self.write(&mut inner)
             .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
-        DefineCotaNFTKey::new_unchecked(inner.into())
+        DefineCotaNFTId::new_unchecked(inner.into())
+    }
+}
+#[derive(Clone)]
+pub struct DefineCotaNFTKeyVec(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for DefineCotaNFTKeyVec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for DefineCotaNFTKeyVec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for DefineCotaNFTKeyVec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} [", Self::NAME)?;
+        for i in 0..self.len() {
+            if i == 0 {
+                write!(f, "{}", self.get_unchecked(i))?;
+            } else {
+                write!(f, ", {}", self.get_unchecked(i))?;
+            }
+        }
+        write!(f, "]")
+    }
+}
+impl ::core::default::Default for DefineCotaNFTKeyVec {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![0, 0, 0, 0];
+        DefineCotaNFTKeyVec::new_unchecked(v.into())
+    }
+}
+impl DefineCotaNFTKeyVec {
+    pub const ITEM_SIZE: usize = 22;
+
+    pub fn total_size(&self) -> usize {
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
+    }
+
+    pub fn item_count(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn len(&self) -> usize {
+        self.item_count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn get(&self, idx: usize) -> Option<DefineCotaNFTId> {
+        if idx >= self.len() {
+            None
+        } else {
+            Some(self.get_unchecked(idx))
+        }
+    }
+
+    pub fn get_unchecked(&self, idx: usize) -> DefineCotaNFTId {
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        DefineCotaNFTId::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn as_reader<'r>(&'r self) -> DefineCotaNFTKeyVecReader<'r> {
+        DefineCotaNFTKeyVecReader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for DefineCotaNFTKeyVec {
+    type Builder = DefineCotaNFTKeyVecBuilder;
+
+    const NAME: &'static str = "DefineCotaNFTKeyVec";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        DefineCotaNFTKeyVec(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        DefineCotaNFTKeyVecReader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        DefineCotaNFTKeyVecReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder().extend(self.into_iter())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct DefineCotaNFTKeyVecReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for DefineCotaNFTKeyVecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for DefineCotaNFTKeyVecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for DefineCotaNFTKeyVecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} [", Self::NAME)?;
+        for i in 0..self.len() {
+            if i == 0 {
+                write!(f, "{}", self.get_unchecked(i))?;
+            } else {
+                write!(f, ", {}", self.get_unchecked(i))?;
+            }
+        }
+        write!(f, "]")
+    }
+}
+impl<'r> DefineCotaNFTKeyVecReader<'r> {
+    pub const ITEM_SIZE: usize = 22;
+
+    pub fn total_size(&self) -> usize {
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
+    }
+
+    pub fn item_count(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn len(&self) -> usize {
+        self.item_count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn get(&self, idx: usize) -> Option<DefineCotaNFTIdReader<'r>> {
+        if idx >= self.len() {
+            None
+        } else {
+            Some(self.get_unchecked(idx))
+        }
+    }
+
+    pub fn get_unchecked(&self, idx: usize) -> DefineCotaNFTIdReader<'r> {
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        DefineCotaNFTIdReader::new_unchecked(&self.as_slice()[start..end])
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTKeyVecReader<'r> {
+    type Entity = DefineCotaNFTKeyVec;
+
+    const NAME: &'static str = "DefineCotaNFTKeyVecReader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        DefineCotaNFTKeyVecReader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len < molecule::NUMBER_SIZE {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        }
+        let item_count = molecule::unpack_number(slice) as usize;
+        if item_count == 0 {
+            if slice_len != molecule::NUMBER_SIZE {
+                return ve!(Self, TotalSizeNotMatch, molecule::NUMBER_SIZE, slice_len);
+            }
+            return Ok(());
+        }
+        let total_size = molecule::NUMBER_SIZE + Self::ITEM_SIZE * item_count;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
+        }
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct DefineCotaNFTKeyVecBuilder(pub(crate) Vec<DefineCotaNFTId>);
+impl DefineCotaNFTKeyVecBuilder {
+    pub const ITEM_SIZE: usize = 22;
+
+    pub fn set(mut self, v: Vec<DefineCotaNFTId>) -> Self {
+        self.0 = v;
+        self
+    }
+
+    pub fn push(mut self, v: DefineCotaNFTId) -> Self {
+        self.0.push(v);
+        self
+    }
+
+    pub fn extend<T: ::core::iter::IntoIterator<Item = DefineCotaNFTId>>(
+        mut self,
+        iter: T,
+    ) -> Self {
+        for elem in iter {
+            self.0.push(elem);
+        }
+        self
+    }
+}
+impl molecule::prelude::Builder for DefineCotaNFTKeyVecBuilder {
+    type Entity = DefineCotaNFTKeyVec;
+
+    const NAME: &'static str = "DefineCotaNFTKeyVecBuilder";
+
+    fn expected_length(&self) -> usize {
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.0.len()
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        writer.write_all(&molecule::pack_number(self.0.len() as molecule::Number))?;
+        for inner in &self.0[..] {
+            writer.write_all(inner.as_slice())?;
+        }
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        DefineCotaNFTKeyVec::new_unchecked(inner.into())
+    }
+}
+pub struct DefineCotaNFTKeyVecIterator(DefineCotaNFTKeyVec, usize, usize);
+impl ::core::iter::Iterator for DefineCotaNFTKeyVecIterator {
+    type Item = DefineCotaNFTId;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 >= self.2 {
+            None
+        } else {
+            let ret = self.0.get_unchecked(self.1);
+            self.1 += 1;
+            Some(ret)
+        }
+    }
+}
+impl ::core::iter::ExactSizeIterator for DefineCotaNFTKeyVecIterator {
+    fn len(&self) -> usize {
+        self.2 - self.1
+    }
+}
+impl ::core::iter::IntoIterator for DefineCotaNFTKeyVec {
+    type IntoIter = DefineCotaNFTKeyVecIterator;
+    type Item = DefineCotaNFTId;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let len = self.len();
+        DefineCotaNFTKeyVecIterator(self, 0, len)
+    }
+}
+impl<'r> DefineCotaNFTKeyVecReader<'r> {
+    pub fn iter<'t>(&'t self) -> DefineCotaNFTKeyVecReaderIterator<'t, 'r> {
+        DefineCotaNFTKeyVecReaderIterator(&self, 0, self.len())
+    }
+}
+pub struct DefineCotaNFTKeyVecReaderIterator<'t, 'r>(
+    &'t DefineCotaNFTKeyVecReader<'r>,
+    usize,
+    usize,
+);
+impl<'t: 'r, 'r> ::core::iter::Iterator for DefineCotaNFTKeyVecReaderIterator<'t, 'r> {
+    type Item = DefineCotaNFTIdReader<'t>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 >= self.2 {
+            None
+        } else {
+            let ret = self.0.get_unchecked(self.1);
+            self.1 += 1;
+            Some(ret)
+        }
+    }
+}
+impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator for DefineCotaNFTKeyVecReaderIterator<'t, 'r> {
+    fn len(&self) -> usize {
+        self.2 - self.1
     }
 }
 #[derive(Clone)]
@@ -527,6 +836,380 @@ impl molecule::prelude::Builder for DefineCotaNFTValueBuilder {
     }
 }
 #[derive(Clone)]
+pub struct DefineCotaNFTValueVec(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for DefineCotaNFTValueVec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for DefineCotaNFTValueVec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for DefineCotaNFTValueVec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} [", Self::NAME)?;
+        for i in 0..self.len() {
+            if i == 0 {
+                write!(f, "{}", self.get_unchecked(i))?;
+            } else {
+                write!(f, ", {}", self.get_unchecked(i))?;
+            }
+        }
+        write!(f, "]")
+    }
+}
+impl ::core::default::Default for DefineCotaNFTValueVec {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![4, 0, 0, 0];
+        DefineCotaNFTValueVec::new_unchecked(v.into())
+    }
+}
+impl DefineCotaNFTValueVec {
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn item_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.item_count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn get(&self, idx: usize) -> Option<DefineCotaNFTValue> {
+        if idx >= self.len() {
+            None
+        } else {
+            Some(self.get_unchecked(idx))
+        }
+    }
+
+    pub fn get_unchecked(&self, idx: usize) -> DefineCotaNFTValue {
+        let slice = self.as_slice();
+        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
+        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
+        if idx == self.len() - 1 {
+            DefineCotaNFTValue::new_unchecked(self.0.slice(start..))
+        } else {
+            let end_idx = start_idx + molecule::NUMBER_SIZE;
+            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
+            DefineCotaNFTValue::new_unchecked(self.0.slice(start..end))
+        }
+    }
+
+    pub fn as_reader<'r>(&'r self) -> DefineCotaNFTValueVecReader<'r> {
+        DefineCotaNFTValueVecReader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for DefineCotaNFTValueVec {
+    type Builder = DefineCotaNFTValueVecBuilder;
+
+    const NAME: &'static str = "DefineCotaNFTValueVec";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        DefineCotaNFTValueVec(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        DefineCotaNFTValueVecReader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        DefineCotaNFTValueVecReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder().extend(self.into_iter())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct DefineCotaNFTValueVecReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for DefineCotaNFTValueVecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for DefineCotaNFTValueVecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for DefineCotaNFTValueVecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} [", Self::NAME)?;
+        for i in 0..self.len() {
+            if i == 0 {
+                write!(f, "{}", self.get_unchecked(i))?;
+            } else {
+                write!(f, ", {}", self.get_unchecked(i))?;
+            }
+        }
+        write!(f, "]")
+    }
+}
+impl<'r> DefineCotaNFTValueVecReader<'r> {
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn item_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.item_count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn get(&self, idx: usize) -> Option<DefineCotaNFTValueReader<'r>> {
+        if idx >= self.len() {
+            None
+        } else {
+            Some(self.get_unchecked(idx))
+        }
+    }
+
+    pub fn get_unchecked(&self, idx: usize) -> DefineCotaNFTValueReader<'r> {
+        let slice = self.as_slice();
+        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
+        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
+        if idx == self.len() - 1 {
+            DefineCotaNFTValueReader::new_unchecked(&self.as_slice()[start..])
+        } else {
+            let end_idx = start_idx + molecule::NUMBER_SIZE;
+            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
+            DefineCotaNFTValueReader::new_unchecked(&self.as_slice()[start..end])
+        }
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTValueVecReader<'r> {
+    type Entity = DefineCotaNFTValueVec;
+
+    const NAME: &'static str = "DefineCotaNFTValueVecReader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        DefineCotaNFTValueVecReader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len < molecule::NUMBER_SIZE {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        }
+        let total_size = molecule::unpack_number(slice) as usize;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
+        }
+        if slice_len == molecule::NUMBER_SIZE {
+            return Ok(());
+        }
+        if slice_len < molecule::NUMBER_SIZE * 2 {
+            return ve!(
+                Self,
+                TotalSizeNotMatch,
+                molecule::NUMBER_SIZE * 2,
+                slice_len
+            );
+        }
+        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
+        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        if slice_len < offset_first {
+            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
+        }
+        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
+            .chunks_exact(molecule::NUMBER_SIZE)
+            .map(|x| molecule::unpack_number(x) as usize)
+            .collect();
+        offsets.push(total_size);
+        if offsets.windows(2).any(|i| i[0] > i[1]) {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        for pair in offsets.windows(2) {
+            let start = pair[0];
+            let end = pair[1];
+            DefineCotaNFTValueReader::verify(&slice[start..end], compatible)?;
+        }
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct DefineCotaNFTValueVecBuilder(pub(crate) Vec<DefineCotaNFTValue>);
+impl DefineCotaNFTValueVecBuilder {
+    pub fn set(mut self, v: Vec<DefineCotaNFTValue>) -> Self {
+        self.0 = v;
+        self
+    }
+
+    pub fn push(mut self, v: DefineCotaNFTValue) -> Self {
+        self.0.push(v);
+        self
+    }
+
+    pub fn extend<T: ::core::iter::IntoIterator<Item = DefineCotaNFTValue>>(
+        mut self,
+        iter: T,
+    ) -> Self {
+        for elem in iter {
+            self.0.push(elem);
+        }
+        self
+    }
+}
+impl molecule::prelude::Builder for DefineCotaNFTValueVecBuilder {
+    type Entity = DefineCotaNFTValueVec;
+
+    const NAME: &'static str = "DefineCotaNFTValueVecBuilder";
+
+    fn expected_length(&self) -> usize {
+        molecule::NUMBER_SIZE * (self.0.len() + 1)
+            + self
+                .0
+                .iter()
+                .map(|inner| inner.as_slice().len())
+                .sum::<usize>()
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        let item_count = self.0.len();
+        if item_count == 0 {
+            writer.write_all(&molecule::pack_number(
+                molecule::NUMBER_SIZE as molecule::Number,
+            ))?;
+        } else {
+            let (total_size, offsets) = self.0.iter().fold(
+                (
+                    molecule::NUMBER_SIZE * (item_count + 1),
+                    Vec::with_capacity(item_count),
+                ),
+                |(start, mut offsets), inner| {
+                    offsets.push(start);
+                    (start + inner.as_slice().len(), offsets)
+                },
+            );
+            writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
+            for offset in offsets.into_iter() {
+                writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
+            }
+            for inner in self.0.iter() {
+                writer.write_all(inner.as_slice())?;
+            }
+        }
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        DefineCotaNFTValueVec::new_unchecked(inner.into())
+    }
+}
+pub struct DefineCotaNFTValueVecIterator(DefineCotaNFTValueVec, usize, usize);
+impl ::core::iter::Iterator for DefineCotaNFTValueVecIterator {
+    type Item = DefineCotaNFTValue;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 >= self.2 {
+            None
+        } else {
+            let ret = self.0.get_unchecked(self.1);
+            self.1 += 1;
+            Some(ret)
+        }
+    }
+}
+impl ::core::iter::ExactSizeIterator for DefineCotaNFTValueVecIterator {
+    fn len(&self) -> usize {
+        self.2 - self.1
+    }
+}
+impl ::core::iter::IntoIterator for DefineCotaNFTValueVec {
+    type IntoIter = DefineCotaNFTValueVecIterator;
+    type Item = DefineCotaNFTValue;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let len = self.len();
+        DefineCotaNFTValueVecIterator(self, 0, len)
+    }
+}
+impl<'r> DefineCotaNFTValueVecReader<'r> {
+    pub fn iter<'t>(&'t self) -> DefineCotaNFTValueVecReaderIterator<'t, 'r> {
+        DefineCotaNFTValueVecReaderIterator(&self, 0, self.len())
+    }
+}
+pub struct DefineCotaNFTValueVecReaderIterator<'t, 'r>(
+    &'t DefineCotaNFTValueVecReader<'r>,
+    usize,
+    usize,
+);
+impl<'t: 'r, 'r> ::core::iter::Iterator for DefineCotaNFTValueVecReaderIterator<'t, 'r> {
+    type Item = DefineCotaNFTValueReader<'t>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 >= self.2 {
+            None
+        } else {
+            let ret = self.0.get_unchecked(self.1);
+            self.1 += 1;
+            Some(ret)
+        }
+    }
+}
+impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator for DefineCotaNFTValueVecReaderIterator<'t, 'r> {
+    fn len(&self) -> usize {
+        self.2 - self.1
+    }
+}
+#[derive(Clone)]
 pub struct DefineCotaNFTEntries(molecule::bytes::Bytes);
 impl ::core::fmt::LowerHex for DefineCotaNFTEntries {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
@@ -545,9 +1228,9 @@ impl ::core::fmt::Debug for DefineCotaNFTEntries {
 impl ::core::fmt::Display for DefineCotaNFTEntries {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "define_key", self.define_key())?;
-        write!(f, ", {}: {}", "define_old_value", self.define_old_value())?;
-        write!(f, ", {}: {}", "define_new_value", self.define_new_value())?;
+        write!(f, "{}: {}", "define_keys", self.define_keys())?;
+        write!(f, ", {}: {}", "define_old_values", self.define_old_values())?;
+        write!(f, ", {}: {}", "define_new_values", self.define_new_values())?;
         write!(f, ", {}: {}", "hold_keys", self.hold_keys())?;
         write!(f, ", {}: {}", "hold_values", self.hold_values())?;
         write!(f, ", {}: {}", "proof", self.proof())?;
@@ -562,11 +1245,9 @@ impl ::core::fmt::Display for DefineCotaNFTEntries {
 impl ::core::default::Default for DefineCotaNFTEntries {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            120, 0, 0, 0, 32, 0, 0, 0, 54, 0, 0, 0, 79, 0, 0, 0, 104, 0, 0, 0, 108, 0, 0, 0, 112,
-            0, 0, 0, 116, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 25, 0, 0, 0, 16, 0, 0, 0, 20, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 25,
-            0, 0, 0, 16, 0, 0, 0, 20, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            60, 0, 0, 0, 32, 0, 0, 0, 36, 0, 0, 0, 40, 0, 0, 0, 44, 0, 0, 0, 48, 0, 0, 0, 52, 0, 0,
+            0, 56, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0,
         ];
         DefineCotaNFTEntries::new_unchecked(v.into())
     }
@@ -594,25 +1275,25 @@ impl DefineCotaNFTEntries {
         Self::FIELD_COUNT != self.field_count()
     }
 
-    pub fn define_key(&self) -> DefineCotaNFTKey {
+    pub fn define_keys(&self) -> DefineCotaNFTKeyVec {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[4..]) as usize;
         let end = molecule::unpack_number(&slice[8..]) as usize;
-        DefineCotaNFTKey::new_unchecked(self.0.slice(start..end))
+        DefineCotaNFTKeyVec::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn define_old_value(&self) -> DefineCotaNFTValue {
+    pub fn define_old_values(&self) -> DefineCotaNFTValueVec {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[8..]) as usize;
         let end = molecule::unpack_number(&slice[12..]) as usize;
-        DefineCotaNFTValue::new_unchecked(self.0.slice(start..end))
+        DefineCotaNFTValueVec::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn define_new_value(&self) -> DefineCotaNFTValue {
+    pub fn define_new_values(&self) -> DefineCotaNFTValueVec {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
         let end = molecule::unpack_number(&slice[16..]) as usize;
-        DefineCotaNFTValue::new_unchecked(self.0.slice(start..end))
+        DefineCotaNFTValueVec::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn hold_keys(&self) -> HoldCotaNFTKeyVec {
@@ -682,9 +1363,9 @@ impl molecule::prelude::Entity for DefineCotaNFTEntries {
 
     fn as_builder(self) -> Self::Builder {
         Self::new_builder()
-            .define_key(self.define_key())
-            .define_old_value(self.define_old_value())
-            .define_new_value(self.define_new_value())
+            .define_keys(self.define_keys())
+            .define_old_values(self.define_old_values())
+            .define_new_values(self.define_new_values())
             .hold_keys(self.hold_keys())
             .hold_values(self.hold_values())
             .proof(self.proof())
@@ -710,9 +1391,9 @@ impl<'r> ::core::fmt::Debug for DefineCotaNFTEntriesReader<'r> {
 impl<'r> ::core::fmt::Display for DefineCotaNFTEntriesReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "define_key", self.define_key())?;
-        write!(f, ", {}: {}", "define_old_value", self.define_old_value())?;
-        write!(f, ", {}: {}", "define_new_value", self.define_new_value())?;
+        write!(f, "{}: {}", "define_keys", self.define_keys())?;
+        write!(f, ", {}: {}", "define_old_values", self.define_old_values())?;
+        write!(f, ", {}: {}", "define_new_values", self.define_new_values())?;
         write!(f, ", {}: {}", "hold_keys", self.hold_keys())?;
         write!(f, ", {}: {}", "hold_values", self.hold_values())?;
         write!(f, ", {}: {}", "proof", self.proof())?;
@@ -747,25 +1428,25 @@ impl<'r> DefineCotaNFTEntriesReader<'r> {
         Self::FIELD_COUNT != self.field_count()
     }
 
-    pub fn define_key(&self) -> DefineCotaNFTKeyReader<'r> {
+    pub fn define_keys(&self) -> DefineCotaNFTKeyVecReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[4..]) as usize;
         let end = molecule::unpack_number(&slice[8..]) as usize;
-        DefineCotaNFTKeyReader::new_unchecked(&self.as_slice()[start..end])
+        DefineCotaNFTKeyVecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn define_old_value(&self) -> DefineCotaNFTValueReader<'r> {
+    pub fn define_old_values(&self) -> DefineCotaNFTValueVecReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[8..]) as usize;
         let end = molecule::unpack_number(&slice[12..]) as usize;
-        DefineCotaNFTValueReader::new_unchecked(&self.as_slice()[start..end])
+        DefineCotaNFTValueVecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn define_new_value(&self) -> DefineCotaNFTValueReader<'r> {
+    pub fn define_new_values(&self) -> DefineCotaNFTValueVecReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
         let end = molecule::unpack_number(&slice[16..]) as usize;
-        DefineCotaNFTValueReader::new_unchecked(&self.as_slice()[start..end])
+        DefineCotaNFTValueVecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
     pub fn hold_keys(&self) -> HoldCotaNFTKeyVecReader<'r> {
@@ -854,9 +1535,9 @@ impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTEntriesReader<'r> {
         if offsets.windows(2).any(|i| i[0] > i[1]) {
             return ve!(Self, OffsetsNotMatch);
         }
-        DefineCotaNFTKeyReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
-        DefineCotaNFTValueReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
-        DefineCotaNFTValueReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
+        DefineCotaNFTKeyVecReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
+        DefineCotaNFTValueVecReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
+        DefineCotaNFTValueVecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
         HoldCotaNFTKeyVecReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
         HoldCotaNFTValueVecReader::verify(&slice[offsets[4]..offsets[5]], compatible)?;
         BytesReader::verify(&slice[offsets[5]..offsets[6]], compatible)?;
@@ -866,29 +1547,29 @@ impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTEntriesReader<'r> {
 }
 #[derive(Debug, Default)]
 pub struct DefineCotaNFTEntriesBuilder {
-    pub(crate) define_key:       DefineCotaNFTKey,
-    pub(crate) define_old_value: DefineCotaNFTValue,
-    pub(crate) define_new_value: DefineCotaNFTValue,
-    pub(crate) hold_keys:        HoldCotaNFTKeyVec,
-    pub(crate) hold_values:      HoldCotaNFTValueVec,
-    pub(crate) proof:            Bytes,
-    pub(crate) action:           Bytes,
+    pub(crate) define_keys:       DefineCotaNFTKeyVec,
+    pub(crate) define_old_values: DefineCotaNFTValueVec,
+    pub(crate) define_new_values: DefineCotaNFTValueVec,
+    pub(crate) hold_keys:         HoldCotaNFTKeyVec,
+    pub(crate) hold_values:       HoldCotaNFTValueVec,
+    pub(crate) proof:             Bytes,
+    pub(crate) action:            Bytes,
 }
 impl DefineCotaNFTEntriesBuilder {
     pub const FIELD_COUNT: usize = 7;
 
-    pub fn define_key(mut self, v: DefineCotaNFTKey) -> Self {
-        self.define_key = v;
+    pub fn define_keys(mut self, v: DefineCotaNFTKeyVec) -> Self {
+        self.define_keys = v;
         self
     }
 
-    pub fn define_old_value(mut self, v: DefineCotaNFTValue) -> Self {
-        self.define_old_value = v;
+    pub fn define_old_values(mut self, v: DefineCotaNFTValueVec) -> Self {
+        self.define_old_values = v;
         self
     }
 
-    pub fn define_new_value(mut self, v: DefineCotaNFTValue) -> Self {
-        self.define_new_value = v;
+    pub fn define_new_values(mut self, v: DefineCotaNFTValueVec) -> Self {
+        self.define_new_values = v;
         self
     }
 
@@ -919,9 +1600,9 @@ impl molecule::prelude::Builder for DefineCotaNFTEntriesBuilder {
 
     fn expected_length(&self) -> usize {
         molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
-            + self.define_key.as_slice().len()
-            + self.define_old_value.as_slice().len()
-            + self.define_new_value.as_slice().len()
+            + self.define_keys.as_slice().len()
+            + self.define_old_values.as_slice().len()
+            + self.define_new_values.as_slice().len()
             + self.hold_keys.as_slice().len()
             + self.hold_values.as_slice().len()
             + self.proof.as_slice().len()
@@ -932,11 +1613,11 @@ impl molecule::prelude::Builder for DefineCotaNFTEntriesBuilder {
         let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
         let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
         offsets.push(total_size);
-        total_size += self.define_key.as_slice().len();
+        total_size += self.define_keys.as_slice().len();
         offsets.push(total_size);
-        total_size += self.define_old_value.as_slice().len();
+        total_size += self.define_old_values.as_slice().len();
         offsets.push(total_size);
-        total_size += self.define_new_value.as_slice().len();
+        total_size += self.define_new_values.as_slice().len();
         offsets.push(total_size);
         total_size += self.hold_keys.as_slice().len();
         offsets.push(total_size);
@@ -949,9 +1630,9 @@ impl molecule::prelude::Builder for DefineCotaNFTEntriesBuilder {
         for offset in offsets.into_iter() {
             writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
         }
-        writer.write_all(self.define_key.as_slice())?;
-        writer.write_all(self.define_old_value.as_slice())?;
-        writer.write_all(self.define_new_value.as_slice())?;
+        writer.write_all(self.define_keys.as_slice())?;
+        writer.write_all(self.define_old_values.as_slice())?;
+        writer.write_all(self.define_new_values.as_slice())?;
         writer.write_all(self.hold_keys.as_slice())?;
         writer.write_all(self.hold_values.as_slice())?;
         writer.write_all(self.proof.as_slice())?;
