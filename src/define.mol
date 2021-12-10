@@ -1,8 +1,8 @@
 import common;
 
 table DefineCotaNFTEntries {
-  define_keys: DefineCotaNFTKeyVec,
-  define_values: DefineCotaNFTValueVec,
+  define_key: DefineCotaNFTKey,
+  define_value: DefineCotaNFTValue,
   proof: Bytes,
   action: Bytes,
 }
