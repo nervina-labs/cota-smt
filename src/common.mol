@@ -22,7 +22,7 @@ struct CotaNFTInfo {
   characteristic: Characteristic,
 }
 
-struct DefineCotaNFTKey {
+struct DefineCotaNFTId {
   smt_type: Uint16,
   cota_id: CotaId,
 }
@@ -32,6 +32,8 @@ table DefineCotaNFTValue {
   issued: Uint32,
   configure: byte,
 }
+vector DefineCotaNFTKeyVec <DefineCotaNFTId>;
+vector DefineCotaNFTValueVec <DefineCotaNFTValue>;
 
 
 vector HoldCotaNFTKeyVec <CotaNFTId>;
