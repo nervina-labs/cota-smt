@@ -1,0 +1,11 @@
+import common;
+
+table DefineCotaNFTEntries {
+  define_keys: DefineCotaNFTKeyVec,
+  define_old_values: DefineCotaNFTValueVec,
+  define_new_values: DefineCotaNFTValueVec,
+  withdrawal_keys: WithdrawalCotaNFTKeyVec,
+  withdrawal_values: WithdrawalCotaNFTValueVec,
+  proof: Bytes,
+  action: Bytes,
+}

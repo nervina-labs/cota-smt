@@ -22,12 +22,36 @@ struct CotaNFTInfo {
   characteristic: Characteristic,
 }
 
-vector HoldCotaNFTKeyVec <CotaNFTId>;
+struct DefineCotaNFTId {
+  smt_type: Uint16,
+  cota_id: CotaId,
+}
 
+table DefineCotaNFTValue {
+  total: Uint32,
+  issued: Uint32,
+  configure: byte,
+}
+vector DefineCotaNFTKeyVec <DefineCotaNFTId>;
+vector DefineCotaNFTValueVec <DefineCotaNFTValue>;
+
+
+vector HoldCotaNFTKeyVec <CotaNFTId>;
 vector HoldCotaNFTValueVec <CotaNFTInfo>;
 
-table HoldCotaNFTEntries {
-  keys: HoldCotaNFTKeyVec,
-  values: HoldCotaNFTValueVec,
-  proof: Bytes,
+
+table WithdrawalCotaNFTValue {
+  nft_info: CotaNFTInfo,
+  to: LockHashSlice,
+  out_point: OutPointSlice,
 }
+vector WithdrawalCotaNFTKeyVec <CotaNFTId>;
+vector WithdrawalCotaNFTValueVec <WithdrawalCotaNFTValue>;
+
+
+table ClaimCotaNFTKey {
+  nft_id: CotaNFTId,
+  out_point: OutPointSlice,
+}
+vector ClaimCotaNFTKeyVec <ClaimCotaNFTKey>;
+vector ClaimCotaNFTValueVec <Byte32>;

@@ -1,9 +1,9 @@
 import common;
 
 table UpdateCotaNFTEntries {
-  keys: HoldCotaNFTKeyVec,
-  old_values: HoldCotaNFTValueVec,
-  new_values: HoldCotaNFTValueVec,
+  hold_keys: HoldCotaNFTKeyVec,
+  hold_old_values: HoldCotaNFTValueVec,
+  hold_new_values: HoldCotaNFTValueVec,
   proof: Bytes,
   action: Bytes,
 }
