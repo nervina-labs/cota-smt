@@ -1,6 +1,6 @@
 import common;
 
-table DefineCotaNFTEntries {
+table MintCotaNFTEntries {
   define_keys: DefineCotaNFTKeyVec,
   define_old_values: DefineCotaNFTValueVec,
   define_new_values: DefineCotaNFTValueVec,

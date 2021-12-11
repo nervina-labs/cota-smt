@@ -14,8 +14,8 @@ pub use alloc::vec::*;
 use super::common::*;
 use molecule::prelude::*;
 #[derive(Clone)]
-pub struct DefineCotaNFTEntries(molecule::bytes::Bytes);
-impl ::core::fmt::LowerHex for DefineCotaNFTEntries {
+pub struct MintCotaNFTEntries(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for MintCotaNFTEntries {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
         if f.alternate() {
@@ -24,12 +24,12 @@ impl ::core::fmt::LowerHex for DefineCotaNFTEntries {
         write!(f, "{}", hex_string(self.as_slice()))
     }
 }
-impl ::core::fmt::Debug for DefineCotaNFTEntries {
+impl ::core::fmt::Debug for MintCotaNFTEntries {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:#x})", Self::NAME, self)
     }
 }
-impl ::core::fmt::Display for DefineCotaNFTEntries {
+impl ::core::fmt::Display for MintCotaNFTEntries {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "define_keys", self.define_keys())?;
@@ -46,17 +46,17 @@ impl ::core::fmt::Display for DefineCotaNFTEntries {
         write!(f, " }}")
     }
 }
-impl ::core::default::Default for DefineCotaNFTEntries {
+impl ::core::default::Default for MintCotaNFTEntries {
     fn default() -> Self {
         let v: Vec<u8> = vec![
             60, 0, 0, 0, 32, 0, 0, 0, 36, 0, 0, 0, 40, 0, 0, 0, 44, 0, 0, 0, 48, 0, 0, 0, 52, 0, 0,
             0, 56, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0,
         ];
-        DefineCotaNFTEntries::new_unchecked(v.into())
+        MintCotaNFTEntries::new_unchecked(v.into())
     }
 }
-impl DefineCotaNFTEntries {
+impl MintCotaNFTEntries {
     pub const FIELD_COUNT: usize = 7;
 
     pub fn total_size(&self) -> usize {
@@ -132,17 +132,17 @@ impl DefineCotaNFTEntries {
         }
     }
 
-    pub fn as_reader<'r>(&'r self) -> DefineCotaNFTEntriesReader<'r> {
-        DefineCotaNFTEntriesReader::new_unchecked(self.as_slice())
+    pub fn as_reader<'r>(&'r self) -> MintCotaNFTEntriesReader<'r> {
+        MintCotaNFTEntriesReader::new_unchecked(self.as_slice())
     }
 }
-impl molecule::prelude::Entity for DefineCotaNFTEntries {
-    type Builder = DefineCotaNFTEntriesBuilder;
+impl molecule::prelude::Entity for MintCotaNFTEntries {
+    type Builder = MintCotaNFTEntriesBuilder;
 
-    const NAME: &'static str = "DefineCotaNFTEntries";
+    const NAME: &'static str = "MintCotaNFTEntries";
 
     fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
-        DefineCotaNFTEntries(data)
+        MintCotaNFTEntries(data)
     }
 
     fn as_bytes(&self) -> molecule::bytes::Bytes {
@@ -154,11 +154,11 @@ impl molecule::prelude::Entity for DefineCotaNFTEntries {
     }
 
     fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
-        DefineCotaNFTEntriesReader::from_slice(slice).map(|reader| reader.to_entity())
+        MintCotaNFTEntriesReader::from_slice(slice).map(|reader| reader.to_entity())
     }
 
     fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
-        DefineCotaNFTEntriesReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+        MintCotaNFTEntriesReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
     }
 
     fn new_builder() -> Self::Builder {
@@ -177,8 +177,8 @@ impl molecule::prelude::Entity for DefineCotaNFTEntries {
     }
 }
 #[derive(Clone, Copy)]
-pub struct DefineCotaNFTEntriesReader<'r>(&'r [u8]);
-impl<'r> ::core::fmt::LowerHex for DefineCotaNFTEntriesReader<'r> {
+pub struct MintCotaNFTEntriesReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for MintCotaNFTEntriesReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
         if f.alternate() {
@@ -187,12 +187,12 @@ impl<'r> ::core::fmt::LowerHex for DefineCotaNFTEntriesReader<'r> {
         write!(f, "{}", hex_string(self.as_slice()))
     }
 }
-impl<'r> ::core::fmt::Debug for DefineCotaNFTEntriesReader<'r> {
+impl<'r> ::core::fmt::Debug for MintCotaNFTEntriesReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:#x})", Self::NAME, self)
     }
 }
-impl<'r> ::core::fmt::Display for DefineCotaNFTEntriesReader<'r> {
+impl<'r> ::core::fmt::Display for MintCotaNFTEntriesReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "define_keys", self.define_keys())?;
@@ -209,7 +209,7 @@ impl<'r> ::core::fmt::Display for DefineCotaNFTEntriesReader<'r> {
         write!(f, " }}")
     }
 }
-impl<'r> DefineCotaNFTEntriesReader<'r> {
+impl<'r> MintCotaNFTEntriesReader<'r> {
     pub const FIELD_COUNT: usize = 7;
 
     pub fn total_size(&self) -> usize {
@@ -285,17 +285,17 @@ impl<'r> DefineCotaNFTEntriesReader<'r> {
         }
     }
 }
-impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTEntriesReader<'r> {
-    type Entity = DefineCotaNFTEntries;
+impl<'r> molecule::prelude::Reader<'r> for MintCotaNFTEntriesReader<'r> {
+    type Entity = MintCotaNFTEntries;
 
-    const NAME: &'static str = "DefineCotaNFTEntriesReader";
+    const NAME: &'static str = "MintCotaNFTEntriesReader";
 
     fn to_entity(&self) -> Self::Entity {
         Self::Entity::new_unchecked(self.as_slice().to_owned().into())
     }
 
     fn new_unchecked(slice: &'r [u8]) -> Self {
-        DefineCotaNFTEntriesReader(slice)
+        MintCotaNFTEntriesReader(slice)
     }
 
     fn as_slice(&self) -> &'r [u8] {
@@ -350,7 +350,7 @@ impl<'r> molecule::prelude::Reader<'r> for DefineCotaNFTEntriesReader<'r> {
     }
 }
 #[derive(Debug, Default)]
-pub struct DefineCotaNFTEntriesBuilder {
+pub struct MintCotaNFTEntriesBuilder {
     pub(crate) define_keys:       DefineCotaNFTKeyVec,
     pub(crate) define_old_values: DefineCotaNFTValueVec,
     pub(crate) define_new_values: DefineCotaNFTValueVec,
@@ -359,7 +359,7 @@ pub struct DefineCotaNFTEntriesBuilder {
     pub(crate) proof:             Bytes,
     pub(crate) action:            Bytes,
 }
-impl DefineCotaNFTEntriesBuilder {
+impl MintCotaNFTEntriesBuilder {
     pub const FIELD_COUNT: usize = 7;
 
     pub fn define_keys(mut self, v: DefineCotaNFTKeyVec) -> Self {
@@ -397,10 +397,10 @@ impl DefineCotaNFTEntriesBuilder {
         self
     }
 }
-impl molecule::prelude::Builder for DefineCotaNFTEntriesBuilder {
-    type Entity = DefineCotaNFTEntries;
+impl molecule::prelude::Builder for MintCotaNFTEntriesBuilder {
+    type Entity = MintCotaNFTEntries;
 
-    const NAME: &'static str = "DefineCotaNFTEntriesBuilder";
+    const NAME: &'static str = "MintCotaNFTEntriesBuilder";
 
     fn expected_length(&self) -> usize {
         molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
@@ -448,6 +448,6 @@ impl molecule::prelude::Builder for DefineCotaNFTEntriesBuilder {
         let mut inner = Vec::with_capacity(self.expected_length());
         self.write(&mut inner)
             .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
-        DefineCotaNFTEntries::new_unchecked(inner.into())
+        MintCotaNFTEntries::new_unchecked(inner.into())
     }
 }
