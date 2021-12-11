@@ -27,7 +27,7 @@ struct DefineCotaNFTId {
   cota_id: CotaId,
 }
 
-table DefineCotaNFTValue {
+struct DefineCotaNFTValue {
   total: Uint32,
   issued: Uint32,
   configure: byte,
