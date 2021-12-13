@@ -40,7 +40,7 @@ vector HoldCotaNFTKeyVec <CotaNFTId>;
 vector HoldCotaNFTValueVec <CotaNFTInfo>;
 
 
-table WithdrawalCotaNFTValue {
+struct WithdrawalCotaNFTValue {
   nft_info: CotaNFTInfo,
   to: LockHashSlice,
   out_point: OutPointSlice,
@@ -49,7 +49,7 @@ vector WithdrawalCotaNFTKeyVec <CotaNFTId>;
 vector WithdrawalCotaNFTValueVec <WithdrawalCotaNFTValue>;
 
 
-table ClaimCotaNFTKey {
+struct ClaimCotaNFTKey {
   nft_id: CotaNFTId,
   out_point: OutPointSlice,
 }

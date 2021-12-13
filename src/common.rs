@@ -5520,69 +5520,34 @@ impl ::core::fmt::Display for WithdrawalCotaNFTValue {
         write!(f, "{}: {}", "nft_info", self.nft_info())?;
         write!(f, ", {}: {}", "to", self.to())?;
         write!(f, ", {}: {}", "out_point", self.out_point())?;
-        let extra_count = self.count_extra_fields();
-        if extra_count != 0 {
-            write!(f, ", .. ({} fields)", extra_count)?;
-        }
         write!(f, " }}")
     }
 }
 impl ::core::default::Default for WithdrawalCotaNFTValue {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            82, 0, 0, 0, 16, 0, 0, 0, 38, 0, 0, 0, 58, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0,
         ];
         WithdrawalCotaNFTValue::new_unchecked(v.into())
     }
 }
 impl WithdrawalCotaNFTValue {
     pub const FIELD_COUNT: usize = 3;
-
-    pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
-    }
-
-    pub fn field_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
-    }
-
-    pub fn count_extra_fields(&self) -> usize {
-        self.field_count() - Self::FIELD_COUNT
-    }
-
-    pub fn has_extra_fields(&self) -> bool {
-        Self::FIELD_COUNT != self.field_count()
-    }
+    pub const FIELD_SIZES: [usize; 3] = [22, 20, 24];
+    pub const TOTAL_SIZE: usize = 66;
 
     pub fn nft_info(&self) -> CotaNFTInfo {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[4..]) as usize;
-        let end = molecule::unpack_number(&slice[8..]) as usize;
-        CotaNFTInfo::new_unchecked(self.0.slice(start..end))
+        CotaNFTInfo::new_unchecked(self.0.slice(0..22))
     }
 
     pub fn to(&self) -> LockHashSlice {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[8..]) as usize;
-        let end = molecule::unpack_number(&slice[12..]) as usize;
-        LockHashSlice::new_unchecked(self.0.slice(start..end))
+        LockHashSlice::new_unchecked(self.0.slice(22..42))
     }
 
     pub fn out_point(&self) -> OutPointSlice {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[12..]) as usize;
-        if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[16..]) as usize;
-            OutPointSlice::new_unchecked(self.0.slice(start..end))
-        } else {
-            OutPointSlice::new_unchecked(self.0.slice(start..))
-        }
+        OutPointSlice::new_unchecked(self.0.slice(42..66))
     }
 
     pub fn as_reader<'r>(&'r self) -> WithdrawalCotaNFTValueReader<'r> {
@@ -5647,59 +5612,24 @@ impl<'r> ::core::fmt::Display for WithdrawalCotaNFTValueReader<'r> {
         write!(f, "{}: {}", "nft_info", self.nft_info())?;
         write!(f, ", {}: {}", "to", self.to())?;
         write!(f, ", {}: {}", "out_point", self.out_point())?;
-        let extra_count = self.count_extra_fields();
-        if extra_count != 0 {
-            write!(f, ", .. ({} fields)", extra_count)?;
-        }
         write!(f, " }}")
     }
 }
 impl<'r> WithdrawalCotaNFTValueReader<'r> {
     pub const FIELD_COUNT: usize = 3;
-
-    pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
-    }
-
-    pub fn field_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
-    }
-
-    pub fn count_extra_fields(&self) -> usize {
-        self.field_count() - Self::FIELD_COUNT
-    }
-
-    pub fn has_extra_fields(&self) -> bool {
-        Self::FIELD_COUNT != self.field_count()
-    }
+    pub const FIELD_SIZES: [usize; 3] = [22, 20, 24];
+    pub const TOTAL_SIZE: usize = 66;
 
     pub fn nft_info(&self) -> CotaNFTInfoReader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[4..]) as usize;
-        let end = molecule::unpack_number(&slice[8..]) as usize;
-        CotaNFTInfoReader::new_unchecked(&self.as_slice()[start..end])
+        CotaNFTInfoReader::new_unchecked(&self.as_slice()[0..22])
     }
 
     pub fn to(&self) -> LockHashSliceReader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[8..]) as usize;
-        let end = molecule::unpack_number(&slice[12..]) as usize;
-        LockHashSliceReader::new_unchecked(&self.as_slice()[start..end])
+        LockHashSliceReader::new_unchecked(&self.as_slice()[22..42])
     }
 
     pub fn out_point(&self) -> OutPointSliceReader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[12..]) as usize;
-        if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[16..]) as usize;
-            OutPointSliceReader::new_unchecked(&self.as_slice()[start..end])
-        } else {
-            OutPointSliceReader::new_unchecked(&self.as_slice()[start..])
-        }
+        OutPointSliceReader::new_unchecked(&self.as_slice()[42..66])
     }
 }
 impl<'r> molecule::prelude::Reader<'r> for WithdrawalCotaNFTValueReader<'r> {
@@ -5719,46 +5649,12 @@ impl<'r> molecule::prelude::Reader<'r> for WithdrawalCotaNFTValueReader<'r> {
         self.0
     }
 
-    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
         use molecule::verification_error as ve;
         let slice_len = slice.len();
-        if slice_len < molecule::NUMBER_SIZE {
-            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        if slice_len != Self::TOTAL_SIZE {
+            return ve!(Self, TotalSizeNotMatch, Self::TOTAL_SIZE, slice_len);
         }
-        let total_size = molecule::unpack_number(slice) as usize;
-        if slice_len != total_size {
-            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
-        }
-        if slice_len == molecule::NUMBER_SIZE && Self::FIELD_COUNT == 0 {
-            return Ok(());
-        }
-        if slice_len < molecule::NUMBER_SIZE * 2 {
-            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE * 2, slice_len);
-        }
-        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
-        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        if slice_len < offset_first {
-            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
-        }
-        let field_count = offset_first / molecule::NUMBER_SIZE - 1;
-        if field_count < Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        } else if !compatible && field_count > Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        };
-        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
-            .chunks_exact(molecule::NUMBER_SIZE)
-            .map(|x| molecule::unpack_number(x) as usize)
-            .collect();
-        offsets.push(total_size);
-        if offsets.windows(2).any(|i| i[0] > i[1]) {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        CotaNFTInfoReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
-        LockHashSliceReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
-        OutPointSliceReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
         Ok(())
     }
 }
@@ -5770,6 +5666,8 @@ pub struct WithdrawalCotaNFTValueBuilder {
 }
 impl WithdrawalCotaNFTValueBuilder {
     pub const FIELD_COUNT: usize = 3;
+    pub const FIELD_SIZES: [usize; 3] = [22, 20, 24];
+    pub const TOTAL_SIZE: usize = 66;
 
     pub fn nft_info(mut self, v: CotaNFTInfo) -> Self {
         self.nft_info = v;
@@ -5792,25 +5690,10 @@ impl molecule::prelude::Builder for WithdrawalCotaNFTValueBuilder {
     const NAME: &'static str = "WithdrawalCotaNFTValueBuilder";
 
     fn expected_length(&self) -> usize {
-        molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
-            + self.nft_info.as_slice().len()
-            + self.to.as_slice().len()
-            + self.out_point.as_slice().len()
+        Self::TOTAL_SIZE
     }
 
     fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
-        let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
-        let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
-        offsets.push(total_size);
-        total_size += self.nft_info.as_slice().len();
-        offsets.push(total_size);
-        total_size += self.to.as_slice().len();
-        offsets.push(total_size);
-        total_size += self.out_point.as_slice().len();
-        writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
-        for offset in offsets.into_iter() {
-            writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
-        }
         writer.write_all(self.nft_info.as_slice())?;
         writer.write_all(self.to.as_slice())?;
         writer.write_all(self.out_point.as_slice())?;
@@ -6161,21 +6044,19 @@ impl ::core::fmt::Display for WithdrawalCotaNFTValueVec {
 }
 impl ::core::default::Default for WithdrawalCotaNFTValueVec {
     fn default() -> Self {
-        let v: Vec<u8> = vec![4, 0, 0, 0];
+        let v: Vec<u8> = vec![0, 0, 0, 0];
         WithdrawalCotaNFTValueVec::new_unchecked(v.into())
     }
 }
 impl WithdrawalCotaNFTValueVec {
+    pub const ITEM_SIZE: usize = 66;
+
     pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
     }
 
     pub fn item_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
+        molecule::unpack_number(self.as_slice()) as usize
     }
 
     pub fn len(&self) -> usize {
@@ -6195,16 +6076,9 @@ impl WithdrawalCotaNFTValueVec {
     }
 
     pub fn get_unchecked(&self, idx: usize) -> WithdrawalCotaNFTValue {
-        let slice = self.as_slice();
-        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
-        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
-        if idx == self.len() - 1 {
-            WithdrawalCotaNFTValue::new_unchecked(self.0.slice(start..))
-        } else {
-            let end_idx = start_idx + molecule::NUMBER_SIZE;
-            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
-            WithdrawalCotaNFTValue::new_unchecked(self.0.slice(start..end))
-        }
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        WithdrawalCotaNFTValue::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn as_reader<'r>(&'r self) -> WithdrawalCotaNFTValueVecReader<'r> {
@@ -6275,16 +6149,14 @@ impl<'r> ::core::fmt::Display for WithdrawalCotaNFTValueVecReader<'r> {
     }
 }
 impl<'r> WithdrawalCotaNFTValueVecReader<'r> {
+    pub const ITEM_SIZE: usize = 66;
+
     pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
     }
 
     pub fn item_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
+        molecule::unpack_number(self.as_slice()) as usize
     }
 
     pub fn len(&self) -> usize {
@@ -6304,16 +6176,9 @@ impl<'r> WithdrawalCotaNFTValueVecReader<'r> {
     }
 
     pub fn get_unchecked(&self, idx: usize) -> WithdrawalCotaNFTValueReader<'r> {
-        let slice = self.as_slice();
-        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
-        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
-        if idx == self.len() - 1 {
-            WithdrawalCotaNFTValueReader::new_unchecked(&self.as_slice()[start..])
-        } else {
-            let end_idx = start_idx + molecule::NUMBER_SIZE;
-            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
-            WithdrawalCotaNFTValueReader::new_unchecked(&self.as_slice()[start..end])
-        }
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        WithdrawalCotaNFTValueReader::new_unchecked(&self.as_slice()[start..end])
     }
 }
 impl<'r> molecule::prelude::Reader<'r> for WithdrawalCotaNFTValueVecReader<'r> {
@@ -6333,46 +6198,22 @@ impl<'r> molecule::prelude::Reader<'r> for WithdrawalCotaNFTValueVecReader<'r> {
         self.0
     }
 
-    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
         use molecule::verification_error as ve;
         let slice_len = slice.len();
         if slice_len < molecule::NUMBER_SIZE {
             return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
         }
-        let total_size = molecule::unpack_number(slice) as usize;
-        if slice_len != total_size {
-            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
-        }
-        if slice_len == molecule::NUMBER_SIZE {
+        let item_count = molecule::unpack_number(slice) as usize;
+        if item_count == 0 {
+            if slice_len != molecule::NUMBER_SIZE {
+                return ve!(Self, TotalSizeNotMatch, molecule::NUMBER_SIZE, slice_len);
+            }
             return Ok(());
         }
-        if slice_len < molecule::NUMBER_SIZE * 2 {
-            return ve!(
-                Self,
-                TotalSizeNotMatch,
-                molecule::NUMBER_SIZE * 2,
-                slice_len
-            );
-        }
-        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
-        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        if slice_len < offset_first {
-            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
-        }
-        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
-            .chunks_exact(molecule::NUMBER_SIZE)
-            .map(|x| molecule::unpack_number(x) as usize)
-            .collect();
-        offsets.push(total_size);
-        if offsets.windows(2).any(|i| i[0] > i[1]) {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        for pair in offsets.windows(2) {
-            let start = pair[0];
-            let end = pair[1];
-            WithdrawalCotaNFTValueReader::verify(&slice[start..end], compatible)?;
+        let total_size = molecule::NUMBER_SIZE + Self::ITEM_SIZE * item_count;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
         }
         Ok(())
     }
@@ -6380,6 +6221,8 @@ impl<'r> molecule::prelude::Reader<'r> for WithdrawalCotaNFTValueVecReader<'r> {
 #[derive(Debug, Default)]
 pub struct WithdrawalCotaNFTValueVecBuilder(pub(crate) Vec<WithdrawalCotaNFTValue>);
 impl WithdrawalCotaNFTValueVecBuilder {
+    pub const ITEM_SIZE: usize = 66;
+
     pub fn set(mut self, v: Vec<WithdrawalCotaNFTValue>) -> Self {
         self.0 = v;
         self
@@ -6406,38 +6249,13 @@ impl molecule::prelude::Builder for WithdrawalCotaNFTValueVecBuilder {
     const NAME: &'static str = "WithdrawalCotaNFTValueVecBuilder";
 
     fn expected_length(&self) -> usize {
-        molecule::NUMBER_SIZE * (self.0.len() + 1)
-            + self
-                .0
-                .iter()
-                .map(|inner| inner.as_slice().len())
-                .sum::<usize>()
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.0.len()
     }
 
     fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
-        let item_count = self.0.len();
-        if item_count == 0 {
-            writer.write_all(&molecule::pack_number(
-                molecule::NUMBER_SIZE as molecule::Number,
-            ))?;
-        } else {
-            let (total_size, offsets) = self.0.iter().fold(
-                (
-                    molecule::NUMBER_SIZE * (item_count + 1),
-                    Vec::with_capacity(item_count),
-                ),
-                |(start, mut offsets), inner| {
-                    offsets.push(start);
-                    (start + inner.as_slice().len(), offsets)
-                },
-            );
-            writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
-            for offset in offsets.into_iter() {
-                writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
-            }
-            for inner in self.0.iter() {
-                writer.write_all(inner.as_slice())?;
-            }
+        writer.write_all(&molecule::pack_number(self.0.len() as molecule::Number))?;
+        for inner in &self.0[..] {
+            writer.write_all(inner.as_slice())?;
         }
         Ok(())
     }
@@ -6528,62 +6346,29 @@ impl ::core::fmt::Display for ClaimCotaNFTKey {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "nft_id", self.nft_id())?;
         write!(f, ", {}: {}", "out_point", self.out_point())?;
-        let extra_count = self.count_extra_fields();
-        if extra_count != 0 {
-            write!(f, ", .. ({} fields)", extra_count)?;
-        }
         write!(f, " }}")
     }
 }
 impl ::core::default::Default for ClaimCotaNFTKey {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            62, 0, 0, 0, 12, 0, 0, 0, 38, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
         ClaimCotaNFTKey::new_unchecked(v.into())
     }
 }
 impl ClaimCotaNFTKey {
     pub const FIELD_COUNT: usize = 2;
-
-    pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
-    }
-
-    pub fn field_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
-    }
-
-    pub fn count_extra_fields(&self) -> usize {
-        self.field_count() - Self::FIELD_COUNT
-    }
-
-    pub fn has_extra_fields(&self) -> bool {
-        Self::FIELD_COUNT != self.field_count()
-    }
+    pub const FIELD_SIZES: [usize; 2] = [26, 24];
+    pub const TOTAL_SIZE: usize = 50;
 
     pub fn nft_id(&self) -> CotaNFTId {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[4..]) as usize;
-        let end = molecule::unpack_number(&slice[8..]) as usize;
-        CotaNFTId::new_unchecked(self.0.slice(start..end))
+        CotaNFTId::new_unchecked(self.0.slice(0..26))
     }
 
     pub fn out_point(&self) -> OutPointSlice {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[8..]) as usize;
-        if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[12..]) as usize;
-            OutPointSlice::new_unchecked(self.0.slice(start..end))
-        } else {
-            OutPointSlice::new_unchecked(self.0.slice(start..))
-        }
+        OutPointSlice::new_unchecked(self.0.slice(26..50))
     }
 
     pub fn as_reader<'r>(&'r self) -> ClaimCotaNFTKeyReader<'r> {
@@ -6646,52 +6431,20 @@ impl<'r> ::core::fmt::Display for ClaimCotaNFTKeyReader<'r> {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "nft_id", self.nft_id())?;
         write!(f, ", {}: {}", "out_point", self.out_point())?;
-        let extra_count = self.count_extra_fields();
-        if extra_count != 0 {
-            write!(f, ", .. ({} fields)", extra_count)?;
-        }
         write!(f, " }}")
     }
 }
 impl<'r> ClaimCotaNFTKeyReader<'r> {
     pub const FIELD_COUNT: usize = 2;
-
-    pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
-    }
-
-    pub fn field_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
-    }
-
-    pub fn count_extra_fields(&self) -> usize {
-        self.field_count() - Self::FIELD_COUNT
-    }
-
-    pub fn has_extra_fields(&self) -> bool {
-        Self::FIELD_COUNT != self.field_count()
-    }
+    pub const FIELD_SIZES: [usize; 2] = [26, 24];
+    pub const TOTAL_SIZE: usize = 50;
 
     pub fn nft_id(&self) -> CotaNFTIdReader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[4..]) as usize;
-        let end = molecule::unpack_number(&slice[8..]) as usize;
-        CotaNFTIdReader::new_unchecked(&self.as_slice()[start..end])
+        CotaNFTIdReader::new_unchecked(&self.as_slice()[0..26])
     }
 
     pub fn out_point(&self) -> OutPointSliceReader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[8..]) as usize;
-        if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[12..]) as usize;
-            OutPointSliceReader::new_unchecked(&self.as_slice()[start..end])
-        } else {
-            OutPointSliceReader::new_unchecked(&self.as_slice()[start..])
-        }
+        OutPointSliceReader::new_unchecked(&self.as_slice()[26..50])
     }
 }
 impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTKeyReader<'r> {
@@ -6711,45 +6464,12 @@ impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTKeyReader<'r> {
         self.0
     }
 
-    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
         use molecule::verification_error as ve;
         let slice_len = slice.len();
-        if slice_len < molecule::NUMBER_SIZE {
-            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        if slice_len != Self::TOTAL_SIZE {
+            return ve!(Self, TotalSizeNotMatch, Self::TOTAL_SIZE, slice_len);
         }
-        let total_size = molecule::unpack_number(slice) as usize;
-        if slice_len != total_size {
-            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
-        }
-        if slice_len == molecule::NUMBER_SIZE && Self::FIELD_COUNT == 0 {
-            return Ok(());
-        }
-        if slice_len < molecule::NUMBER_SIZE * 2 {
-            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE * 2, slice_len);
-        }
-        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
-        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        if slice_len < offset_first {
-            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
-        }
-        let field_count = offset_first / molecule::NUMBER_SIZE - 1;
-        if field_count < Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        } else if !compatible && field_count > Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        };
-        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
-            .chunks_exact(molecule::NUMBER_SIZE)
-            .map(|x| molecule::unpack_number(x) as usize)
-            .collect();
-        offsets.push(total_size);
-        if offsets.windows(2).any(|i| i[0] > i[1]) {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        CotaNFTIdReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
-        OutPointSliceReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
         Ok(())
     }
 }
@@ -6760,6 +6480,8 @@ pub struct ClaimCotaNFTKeyBuilder {
 }
 impl ClaimCotaNFTKeyBuilder {
     pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [26, 24];
+    pub const TOTAL_SIZE: usize = 50;
 
     pub fn nft_id(mut self, v: CotaNFTId) -> Self {
         self.nft_id = v;
@@ -6777,22 +6499,10 @@ impl molecule::prelude::Builder for ClaimCotaNFTKeyBuilder {
     const NAME: &'static str = "ClaimCotaNFTKeyBuilder";
 
     fn expected_length(&self) -> usize {
-        molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
-            + self.nft_id.as_slice().len()
-            + self.out_point.as_slice().len()
+        Self::TOTAL_SIZE
     }
 
     fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
-        let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
-        let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
-        offsets.push(total_size);
-        total_size += self.nft_id.as_slice().len();
-        offsets.push(total_size);
-        total_size += self.out_point.as_slice().len();
-        writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
-        for offset in offsets.into_iter() {
-            writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
-        }
         writer.write_all(self.nft_id.as_slice())?;
         writer.write_all(self.out_point.as_slice())?;
         Ok(())
@@ -6836,21 +6546,19 @@ impl ::core::fmt::Display for ClaimCotaNFTKeyVec {
 }
 impl ::core::default::Default for ClaimCotaNFTKeyVec {
     fn default() -> Self {
-        let v: Vec<u8> = vec![4, 0, 0, 0];
+        let v: Vec<u8> = vec![0, 0, 0, 0];
         ClaimCotaNFTKeyVec::new_unchecked(v.into())
     }
 }
 impl ClaimCotaNFTKeyVec {
+    pub const ITEM_SIZE: usize = 50;
+
     pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
     }
 
     pub fn item_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
+        molecule::unpack_number(self.as_slice()) as usize
     }
 
     pub fn len(&self) -> usize {
@@ -6870,16 +6578,9 @@ impl ClaimCotaNFTKeyVec {
     }
 
     pub fn get_unchecked(&self, idx: usize) -> ClaimCotaNFTKey {
-        let slice = self.as_slice();
-        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
-        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
-        if idx == self.len() - 1 {
-            ClaimCotaNFTKey::new_unchecked(self.0.slice(start..))
-        } else {
-            let end_idx = start_idx + molecule::NUMBER_SIZE;
-            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
-            ClaimCotaNFTKey::new_unchecked(self.0.slice(start..end))
-        }
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        ClaimCotaNFTKey::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn as_reader<'r>(&'r self) -> ClaimCotaNFTKeyVecReader<'r> {
@@ -6949,16 +6650,14 @@ impl<'r> ::core::fmt::Display for ClaimCotaNFTKeyVecReader<'r> {
     }
 }
 impl<'r> ClaimCotaNFTKeyVecReader<'r> {
+    pub const ITEM_SIZE: usize = 50;
+
     pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
     }
 
     pub fn item_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
+        molecule::unpack_number(self.as_slice()) as usize
     }
 
     pub fn len(&self) -> usize {
@@ -6978,16 +6677,9 @@ impl<'r> ClaimCotaNFTKeyVecReader<'r> {
     }
 
     pub fn get_unchecked(&self, idx: usize) -> ClaimCotaNFTKeyReader<'r> {
-        let slice = self.as_slice();
-        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
-        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
-        if idx == self.len() - 1 {
-            ClaimCotaNFTKeyReader::new_unchecked(&self.as_slice()[start..])
-        } else {
-            let end_idx = start_idx + molecule::NUMBER_SIZE;
-            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
-            ClaimCotaNFTKeyReader::new_unchecked(&self.as_slice()[start..end])
-        }
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        ClaimCotaNFTKeyReader::new_unchecked(&self.as_slice()[start..end])
     }
 }
 impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTKeyVecReader<'r> {
@@ -7007,46 +6699,22 @@ impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTKeyVecReader<'r> {
         self.0
     }
 
-    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
         use molecule::verification_error as ve;
         let slice_len = slice.len();
         if slice_len < molecule::NUMBER_SIZE {
             return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
         }
-        let total_size = molecule::unpack_number(slice) as usize;
-        if slice_len != total_size {
-            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
-        }
-        if slice_len == molecule::NUMBER_SIZE {
+        let item_count = molecule::unpack_number(slice) as usize;
+        if item_count == 0 {
+            if slice_len != molecule::NUMBER_SIZE {
+                return ve!(Self, TotalSizeNotMatch, molecule::NUMBER_SIZE, slice_len);
+            }
             return Ok(());
         }
-        if slice_len < molecule::NUMBER_SIZE * 2 {
-            return ve!(
-                Self,
-                TotalSizeNotMatch,
-                molecule::NUMBER_SIZE * 2,
-                slice_len
-            );
-        }
-        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
-        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        if slice_len < offset_first {
-            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
-        }
-        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
-            .chunks_exact(molecule::NUMBER_SIZE)
-            .map(|x| molecule::unpack_number(x) as usize)
-            .collect();
-        offsets.push(total_size);
-        if offsets.windows(2).any(|i| i[0] > i[1]) {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        for pair in offsets.windows(2) {
-            let start = pair[0];
-            let end = pair[1];
-            ClaimCotaNFTKeyReader::verify(&slice[start..end], compatible)?;
+        let total_size = molecule::NUMBER_SIZE + Self::ITEM_SIZE * item_count;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
         }
         Ok(())
     }
@@ -7054,6 +6722,8 @@ impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTKeyVecReader<'r> {
 #[derive(Debug, Default)]
 pub struct ClaimCotaNFTKeyVecBuilder(pub(crate) Vec<ClaimCotaNFTKey>);
 impl ClaimCotaNFTKeyVecBuilder {
+    pub const ITEM_SIZE: usize = 50;
+
     pub fn set(mut self, v: Vec<ClaimCotaNFTKey>) -> Self {
         self.0 = v;
         self
@@ -7080,38 +6750,13 @@ impl molecule::prelude::Builder for ClaimCotaNFTKeyVecBuilder {
     const NAME: &'static str = "ClaimCotaNFTKeyVecBuilder";
 
     fn expected_length(&self) -> usize {
-        molecule::NUMBER_SIZE * (self.0.len() + 1)
-            + self
-                .0
-                .iter()
-                .map(|inner| inner.as_slice().len())
-                .sum::<usize>()
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.0.len()
     }
 
     fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
-        let item_count = self.0.len();
-        if item_count == 0 {
-            writer.write_all(&molecule::pack_number(
-                molecule::NUMBER_SIZE as molecule::Number,
-            ))?;
-        } else {
-            let (total_size, offsets) = self.0.iter().fold(
-                (
-                    molecule::NUMBER_SIZE * (item_count + 1),
-                    Vec::with_capacity(item_count),
-                ),
-                |(start, mut offsets), inner| {
-                    offsets.push(start);
-                    (start + inner.as_slice().len(), offsets)
-                },
-            );
-            writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
-            for offset in offsets.into_iter() {
-                writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
-            }
-            for inner in self.0.iter() {
-                writer.write_all(inner.as_slice())?;
-            }
+        writer.write_all(&molecule::pack_number(self.0.len() as molecule::Number))?;
+        for inner in &self.0[..] {
+            writer.write_all(inner.as_slice())?;
         }
         Ok(())
     }
