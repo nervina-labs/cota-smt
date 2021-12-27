@@ -8,7 +8,6 @@ vector Bytes <byte>;
 array CotaId [byte; 20];
 array Characteristic [byte; 20];
 array OutPointSlice [byte; 24];
-array LockHashSlice [byte; 20];
 
 struct CotaNFTId {
   smt_type: Uint16,
@@ -40,9 +39,9 @@ vector HoldCotaNFTKeyVec <CotaNFTId>;
 vector HoldCotaNFTValueVec <CotaNFTInfo>;
 
 
-struct WithdrawalCotaNFTValue {
+table WithdrawalCotaNFTValue {
   nft_info: CotaNFTInfo,
-  to: LockHashSlice,
+  to_lock: Bytes,
   out_point: OutPointSlice,
 }
 vector WithdrawalCotaNFTKeyVec <CotaNFTId>;
