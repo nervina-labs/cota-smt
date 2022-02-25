@@ -54,3 +54,4 @@ struct ClaimCotaNFTKey {
 }
 vector ClaimCotaNFTKeyVec <ClaimCotaNFTKey>;
 vector ClaimCotaNFTValueVec <Byte32>;
+vector ClaimCotaNFTInfoVec <CotaNFTInfo>;
