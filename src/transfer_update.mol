@@ -1,0 +1,25 @@
+import common;
+
+table ClaimUpdateCotaNFTEntries {
+  hold_keys: HoldCotaNFTKeyVec,
+  hold_old_values: HoldCotaNFTValueVec,
+  hold_new_values: HoldCotaNFTValueVec,
+  claim_keys: ClaimCotaNFTKeyVec,
+  claim_values: ClaimCotaNFTValueVec,
+  proof: Bytes,
+  withdrawal_proof: Bytes,
+  action: Bytes,
+}
+
+table TransferUpdateCotaNFTEntries {
+  hold_keys: HoldCotaNFTKeyVec,
+  hold_old_values: HoldCotaNFTValueVec,
+  hold_new_values: HoldCotaNFTValueVec,
+  claim_keys: ClaimCotaNFTKeyVec,
+  claim_values: ClaimCotaNFTValueVec,
+  withdrawal_keys: WithdrawalCotaNFTKeyVec,
+  withdrawal_values: WithdrawalCotaNFTValueVec,
+  proof: Bytes,
+  withdrawal_proof: Bytes,
+  action: Bytes,
+}

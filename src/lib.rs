@@ -10,6 +10,7 @@ pub mod registry;
 pub mod smt;
 pub mod transfer;
 pub mod update;
+pub mod transfer_update;
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "std")] {
