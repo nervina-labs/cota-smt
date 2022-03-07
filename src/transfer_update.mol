@@ -19,3 +19,14 @@ table TransferUpdateCotaNFTEntries {
   withdrawal_proof: Bytes,
   action: Bytes,
 }
+
+// V1
+table TransferUpdateCotaNFTV1Entries {
+  claim_keys: ClaimCotaNFTKeyVec,
+  claim_infos: ClaimCotaNFTInfoVec,
+  withdrawal_keys: WithdrawalCotaNFTKeyV1Vec,
+  withdrawal_values: WithdrawalCotaNFTValueV1Vec,
+  proof: Bytes,
+  withdrawal_proof: Bytes,
+  action: Bytes,
+}

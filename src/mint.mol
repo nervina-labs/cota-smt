@@ -9,3 +9,14 @@ table MintCotaNFTEntries {
   proof: Bytes,
   action: Bytes,
 }
+
+// V1
+table MintCotaNFTV1Entries {
+  define_keys: DefineCotaNFTKeyVec,
+  define_old_values: DefineCotaNFTValueVec,
+  define_new_values: DefineCotaNFTValueVec,
+  withdrawal_keys: WithdrawalCotaNFTKeyV1Vec,
+  withdrawal_values: WithdrawalCotaNFTValueV1Vec,
+  proof: Bytes,
+  action: Bytes,
+}

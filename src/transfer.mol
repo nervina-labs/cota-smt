@@ -22,8 +22,28 @@ table ClaimCotaNFTEntries {
 table TransferCotaNFTEntries {
   claim_keys: ClaimCotaNFTKeyVec,
   claim_values: ClaimCotaNFTValueVec,
+  withdrawal_keys: WithdrawalCotaNFTKeyV1Vec,
+  withdrawal_values: WithdrawalCotaNFTValueV1Vec,
+  proof: Bytes,
+  withdrawal_proof: Bytes,
+  action: Bytes,
+}
+
+// V1
+table WithdrawalCotaNFTV1Entries {
+  hold_keys: HoldCotaNFTKeyVec,
+  hold_values: HoldCotaNFTValueVec,
   withdrawal_keys: WithdrawalCotaNFTKeyVec,
   withdrawal_values: WithdrawalCotaNFTValueVec,
+  proof: Bytes,
+  action: Bytes,
+}
+
+table TransferCotaNFTV1Entries {
+  claim_keys: ClaimCotaNFTKeyVec,
+  claim_values: ClaimCotaNFTValueVec,
+  withdrawal_keys: WithdrawalCotaNFTKeyV1Vec,
+  withdrawal_values: WithdrawalCotaNFTValueV1Vec,
   proof: Bytes,
   withdrawal_proof: Bytes,
   action: Bytes,
