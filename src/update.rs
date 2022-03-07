@@ -9,7 +9,6 @@ use super::molecule::{self, prelude::*};
 extern crate alloc;
 pub use alloc::vec::*;
 // these lines above are manually added
-// replace "::molecule" to "molecule" in below code
 
 use super::common::*;
 use molecule::prelude::*;
