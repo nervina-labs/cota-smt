@@ -6870,6 +6870,195 @@ impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator for ClaimCotaNFTValueVecReaderI
     }
 }
 #[derive(Clone)]
+pub struct ClaimCotaNFTInfo(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for ClaimCotaNFTInfo {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for ClaimCotaNFTInfo {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for ClaimCotaNFTInfo {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "version", self.version())?;
+        write!(f, ", {}: {}", "nft_info", self.nft_info())?;
+        write!(f, " }}")
+    }
+}
+impl ::core::default::Default for ClaimCotaNFTInfo {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        ClaimCotaNFTInfo::new_unchecked(v.into())
+    }
+}
+impl ClaimCotaNFTInfo {
+    pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [1, 22];
+    pub const TOTAL_SIZE: usize = 23;
+
+    pub fn version(&self) -> Byte {
+        Byte::new_unchecked(self.0.slice(0..1))
+    }
+
+    pub fn nft_info(&self) -> CotaNFTInfo {
+        CotaNFTInfo::new_unchecked(self.0.slice(1..23))
+    }
+
+    pub fn as_reader<'r>(&'r self) -> ClaimCotaNFTInfoReader<'r> {
+        ClaimCotaNFTInfoReader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for ClaimCotaNFTInfo {
+    type Builder = ClaimCotaNFTInfoBuilder;
+
+    const NAME: &'static str = "ClaimCotaNFTInfo";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        ClaimCotaNFTInfo(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        ClaimCotaNFTInfoReader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        ClaimCotaNFTInfoReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder()
+            .version(self.version())
+            .nft_info(self.nft_info())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct ClaimCotaNFTInfoReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for ClaimCotaNFTInfoReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for ClaimCotaNFTInfoReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for ClaimCotaNFTInfoReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "version", self.version())?;
+        write!(f, ", {}: {}", "nft_info", self.nft_info())?;
+        write!(f, " }}")
+    }
+}
+impl<'r> ClaimCotaNFTInfoReader<'r> {
+    pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [1, 22];
+    pub const TOTAL_SIZE: usize = 23;
+
+    pub fn version(&self) -> ByteReader<'r> {
+        ByteReader::new_unchecked(&self.as_slice()[0..1])
+    }
+
+    pub fn nft_info(&self) -> CotaNFTInfoReader<'r> {
+        CotaNFTInfoReader::new_unchecked(&self.as_slice()[1..23])
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTInfoReader<'r> {
+    type Entity = ClaimCotaNFTInfo;
+
+    const NAME: &'static str = "ClaimCotaNFTInfoReader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        ClaimCotaNFTInfoReader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len != Self::TOTAL_SIZE {
+            return ve!(Self, TotalSizeNotMatch, Self::TOTAL_SIZE, slice_len);
+        }
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct ClaimCotaNFTInfoBuilder {
+    pub(crate) version:  Byte,
+    pub(crate) nft_info: CotaNFTInfo,
+}
+impl ClaimCotaNFTInfoBuilder {
+    pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [1, 22];
+    pub const TOTAL_SIZE: usize = 23;
+
+    pub fn version(mut self, v: Byte) -> Self {
+        self.version = v;
+        self
+    }
+
+    pub fn nft_info(mut self, v: CotaNFTInfo) -> Self {
+        self.nft_info = v;
+        self
+    }
+}
+impl molecule::prelude::Builder for ClaimCotaNFTInfoBuilder {
+    type Entity = ClaimCotaNFTInfo;
+
+    const NAME: &'static str = "ClaimCotaNFTInfoBuilder";
+
+    fn expected_length(&self) -> usize {
+        Self::TOTAL_SIZE
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        writer.write_all(self.version.as_slice())?;
+        writer.write_all(self.nft_info.as_slice())?;
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        ClaimCotaNFTInfo::new_unchecked(inner.into())
+    }
+}
+#[derive(Clone)]
 pub struct ClaimCotaNFTInfoVec(molecule::bytes::Bytes);
 impl ::core::fmt::LowerHex for ClaimCotaNFTInfoVec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
@@ -6905,7 +7094,7 @@ impl ::core::default::Default for ClaimCotaNFTInfoVec {
     }
 }
 impl ClaimCotaNFTInfoVec {
-    pub const ITEM_SIZE: usize = 22;
+    pub const ITEM_SIZE: usize = 23;
 
     pub fn total_size(&self) -> usize {
         molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
@@ -6923,7 +7112,7 @@ impl ClaimCotaNFTInfoVec {
         self.len() == 0
     }
 
-    pub fn get(&self, idx: usize) -> Option<CotaNFTInfo> {
+    pub fn get(&self, idx: usize) -> Option<ClaimCotaNFTInfo> {
         if idx >= self.len() {
             None
         } else {
@@ -6931,10 +7120,10 @@ impl ClaimCotaNFTInfoVec {
         }
     }
 
-    pub fn get_unchecked(&self, idx: usize) -> CotaNFTInfo {
+    pub fn get_unchecked(&self, idx: usize) -> ClaimCotaNFTInfo {
         let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
         let end = start + Self::ITEM_SIZE;
-        CotaNFTInfo::new_unchecked(self.0.slice(start..end))
+        ClaimCotaNFTInfo::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn as_reader<'r>(&'r self) -> ClaimCotaNFTInfoVecReader<'r> {
@@ -7004,7 +7193,7 @@ impl<'r> ::core::fmt::Display for ClaimCotaNFTInfoVecReader<'r> {
     }
 }
 impl<'r> ClaimCotaNFTInfoVecReader<'r> {
-    pub const ITEM_SIZE: usize = 22;
+    pub const ITEM_SIZE: usize = 23;
 
     pub fn total_size(&self) -> usize {
         molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
@@ -7022,7 +7211,7 @@ impl<'r> ClaimCotaNFTInfoVecReader<'r> {
         self.len() == 0
     }
 
-    pub fn get(&self, idx: usize) -> Option<CotaNFTInfoReader<'r>> {
+    pub fn get(&self, idx: usize) -> Option<ClaimCotaNFTInfoReader<'r>> {
         if idx >= self.len() {
             None
         } else {
@@ -7030,10 +7219,10 @@ impl<'r> ClaimCotaNFTInfoVecReader<'r> {
         }
     }
 
-    pub fn get_unchecked(&self, idx: usize) -> CotaNFTInfoReader<'r> {
+    pub fn get_unchecked(&self, idx: usize) -> ClaimCotaNFTInfoReader<'r> {
         let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
         let end = start + Self::ITEM_SIZE;
-        CotaNFTInfoReader::new_unchecked(&self.as_slice()[start..end])
+        ClaimCotaNFTInfoReader::new_unchecked(&self.as_slice()[start..end])
     }
 }
 impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTInfoVecReader<'r> {
@@ -7074,28 +7263,31 @@ impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTInfoVecReader<'r> {
     }
 }
 #[derive(Debug, Default)]
-pub struct ClaimCotaNFTInfoVecBuilder(pub(crate) Vec<CotaNFTInfo>);
+pub struct ClaimCotaNFTInfoVecBuilder(pub(crate) Vec<ClaimCotaNFTInfo>);
 impl ClaimCotaNFTInfoVecBuilder {
-    pub const ITEM_SIZE: usize = 22;
+    pub const ITEM_SIZE: usize = 23;
 
-    pub fn set(mut self, v: Vec<CotaNFTInfo>) -> Self {
+    pub fn set(mut self, v: Vec<ClaimCotaNFTInfo>) -> Self {
         self.0 = v;
         self
     }
 
-    pub fn push(mut self, v: CotaNFTInfo) -> Self {
+    pub fn push(mut self, v: ClaimCotaNFTInfo) -> Self {
         self.0.push(v);
         self
     }
 
-    pub fn extend<T: ::core::iter::IntoIterator<Item = CotaNFTInfo>>(mut self, iter: T) -> Self {
+    pub fn extend<T: ::core::iter::IntoIterator<Item = ClaimCotaNFTInfo>>(
+        mut self,
+        iter: T,
+    ) -> Self {
         for elem in iter {
             self.0.push(elem);
         }
         self
     }
 
-    pub fn replace(&mut self, index: usize, v: CotaNFTInfo) -> Option<CotaNFTInfo> {
+    pub fn replace(&mut self, index: usize, v: ClaimCotaNFTInfo) -> Option<ClaimCotaNFTInfo> {
         self.0
             .get_mut(index)
             .map(|item| ::core::mem::replace(item, v))
@@ -7127,7 +7319,7 @@ impl molecule::prelude::Builder for ClaimCotaNFTInfoVecBuilder {
 }
 pub struct ClaimCotaNFTInfoVecIterator(ClaimCotaNFTInfoVec, usize, usize);
 impl ::core::iter::Iterator for ClaimCotaNFTInfoVecIterator {
-    type Item = CotaNFTInfo;
+    type Item = ClaimCotaNFTInfo;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 >= self.2 {
@@ -7146,7 +7338,7 @@ impl ::core::iter::ExactSizeIterator for ClaimCotaNFTInfoVecIterator {
 }
 impl ::core::iter::IntoIterator for ClaimCotaNFTInfoVec {
     type IntoIter = ClaimCotaNFTInfoVecIterator;
-    type Item = CotaNFTInfo;
+    type Item = ClaimCotaNFTInfo;
 
     fn into_iter(self) -> Self::IntoIter {
         let len = self.len();
@@ -7164,7 +7356,7 @@ pub struct ClaimCotaNFTInfoVecReaderIterator<'t, 'r>(
     usize,
 );
 impl<'t: 'r, 'r> ::core::iter::Iterator for ClaimCotaNFTInfoVecReaderIterator<'t, 'r> {
-    type Item = CotaNFTInfoReader<'t>;
+    type Item = ClaimCotaNFTInfoReader<'t>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 >= self.2 {
