@@ -228,7 +228,7 @@ name = "cota-smt"
 version = "0.1.0"
 dependencies = [
  "blake2b-ref 0.3.0",
- "cfg-if 0.1.10",
+ "cfg-if 1.0.0",
  "ckb-std",
  "ckb-types",
  "molecule",
