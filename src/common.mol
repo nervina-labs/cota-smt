@@ -54,4 +54,22 @@ struct ClaimCotaNFTKey {
 }
 vector ClaimCotaNFTKeyVec <ClaimCotaNFTKey>;
 vector ClaimCotaNFTValueVec <Byte32>;
-vector ClaimCotaNFTInfoVec <CotaNFTInfo>;
+struct ClaimCotaNFTInfo {
+  version: byte,
+  nft_info: CotaNFTInfo,
+}
+vector ClaimCotaNFTInfoVec <ClaimCotaNFTInfo>;
+
+
+// V1
+struct WithdrawalCotaNFTKeyV1 {
+  nft_id: CotaNFTId,
+  out_point: OutPointSlice,
+}
+vector WithdrawalCotaNFTKeyV1Vec <WithdrawalCotaNFTKeyV1>;
+
+table WithdrawalCotaNFTValueV1 {
+  nft_info: CotaNFTInfo,
+  to_lock: Bytes,
+}
+vector WithdrawalCotaNFTValueV1Vec <WithdrawalCotaNFTValueV1>;

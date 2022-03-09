@@ -9,7 +9,6 @@ use super::molecule::{self, prelude::*};
 extern crate alloc;
 pub use alloc::vec::*;
 // these lines above are manually added
-// replace "::molecule" to "molecule" in below code
 
 use molecule::prelude::*;
 #[derive(Clone)]
@@ -6871,6 +6870,195 @@ impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator for ClaimCotaNFTValueVecReaderI
     }
 }
 #[derive(Clone)]
+pub struct ClaimCotaNFTInfo(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for ClaimCotaNFTInfo {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for ClaimCotaNFTInfo {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for ClaimCotaNFTInfo {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "version", self.version())?;
+        write!(f, ", {}: {}", "nft_info", self.nft_info())?;
+        write!(f, " }}")
+    }
+}
+impl ::core::default::Default for ClaimCotaNFTInfo {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        ClaimCotaNFTInfo::new_unchecked(v.into())
+    }
+}
+impl ClaimCotaNFTInfo {
+    pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [1, 22];
+    pub const TOTAL_SIZE: usize = 23;
+
+    pub fn version(&self) -> Byte {
+        Byte::new_unchecked(self.0.slice(0..1))
+    }
+
+    pub fn nft_info(&self) -> CotaNFTInfo {
+        CotaNFTInfo::new_unchecked(self.0.slice(1..23))
+    }
+
+    pub fn as_reader<'r>(&'r self) -> ClaimCotaNFTInfoReader<'r> {
+        ClaimCotaNFTInfoReader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for ClaimCotaNFTInfo {
+    type Builder = ClaimCotaNFTInfoBuilder;
+
+    const NAME: &'static str = "ClaimCotaNFTInfo";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        ClaimCotaNFTInfo(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        ClaimCotaNFTInfoReader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        ClaimCotaNFTInfoReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder()
+            .version(self.version())
+            .nft_info(self.nft_info())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct ClaimCotaNFTInfoReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for ClaimCotaNFTInfoReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for ClaimCotaNFTInfoReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for ClaimCotaNFTInfoReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "version", self.version())?;
+        write!(f, ", {}: {}", "nft_info", self.nft_info())?;
+        write!(f, " }}")
+    }
+}
+impl<'r> ClaimCotaNFTInfoReader<'r> {
+    pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [1, 22];
+    pub const TOTAL_SIZE: usize = 23;
+
+    pub fn version(&self) -> ByteReader<'r> {
+        ByteReader::new_unchecked(&self.as_slice()[0..1])
+    }
+
+    pub fn nft_info(&self) -> CotaNFTInfoReader<'r> {
+        CotaNFTInfoReader::new_unchecked(&self.as_slice()[1..23])
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTInfoReader<'r> {
+    type Entity = ClaimCotaNFTInfo;
+
+    const NAME: &'static str = "ClaimCotaNFTInfoReader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        ClaimCotaNFTInfoReader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len != Self::TOTAL_SIZE {
+            return ve!(Self, TotalSizeNotMatch, Self::TOTAL_SIZE, slice_len);
+        }
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct ClaimCotaNFTInfoBuilder {
+    pub(crate) version:  Byte,
+    pub(crate) nft_info: CotaNFTInfo,
+}
+impl ClaimCotaNFTInfoBuilder {
+    pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [1, 22];
+    pub const TOTAL_SIZE: usize = 23;
+
+    pub fn version(mut self, v: Byte) -> Self {
+        self.version = v;
+        self
+    }
+
+    pub fn nft_info(mut self, v: CotaNFTInfo) -> Self {
+        self.nft_info = v;
+        self
+    }
+}
+impl molecule::prelude::Builder for ClaimCotaNFTInfoBuilder {
+    type Entity = ClaimCotaNFTInfo;
+
+    const NAME: &'static str = "ClaimCotaNFTInfoBuilder";
+
+    fn expected_length(&self) -> usize {
+        Self::TOTAL_SIZE
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        writer.write_all(self.version.as_slice())?;
+        writer.write_all(self.nft_info.as_slice())?;
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        ClaimCotaNFTInfo::new_unchecked(inner.into())
+    }
+}
+#[derive(Clone)]
 pub struct ClaimCotaNFTInfoVec(molecule::bytes::Bytes);
 impl ::core::fmt::LowerHex for ClaimCotaNFTInfoVec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
@@ -6906,7 +7094,7 @@ impl ::core::default::Default for ClaimCotaNFTInfoVec {
     }
 }
 impl ClaimCotaNFTInfoVec {
-    pub const ITEM_SIZE: usize = 22;
+    pub const ITEM_SIZE: usize = 23;
 
     pub fn total_size(&self) -> usize {
         molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
@@ -6924,7 +7112,7 @@ impl ClaimCotaNFTInfoVec {
         self.len() == 0
     }
 
-    pub fn get(&self, idx: usize) -> Option<CotaNFTInfo> {
+    pub fn get(&self, idx: usize) -> Option<ClaimCotaNFTInfo> {
         if idx >= self.len() {
             None
         } else {
@@ -6932,10 +7120,10 @@ impl ClaimCotaNFTInfoVec {
         }
     }
 
-    pub fn get_unchecked(&self, idx: usize) -> CotaNFTInfo {
+    pub fn get_unchecked(&self, idx: usize) -> ClaimCotaNFTInfo {
         let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
         let end = start + Self::ITEM_SIZE;
-        CotaNFTInfo::new_unchecked(self.0.slice(start..end))
+        ClaimCotaNFTInfo::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn as_reader<'r>(&'r self) -> ClaimCotaNFTInfoVecReader<'r> {
@@ -7005,7 +7193,7 @@ impl<'r> ::core::fmt::Display for ClaimCotaNFTInfoVecReader<'r> {
     }
 }
 impl<'r> ClaimCotaNFTInfoVecReader<'r> {
-    pub const ITEM_SIZE: usize = 22;
+    pub const ITEM_SIZE: usize = 23;
 
     pub fn total_size(&self) -> usize {
         molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
@@ -7023,7 +7211,7 @@ impl<'r> ClaimCotaNFTInfoVecReader<'r> {
         self.len() == 0
     }
 
-    pub fn get(&self, idx: usize) -> Option<CotaNFTInfoReader<'r>> {
+    pub fn get(&self, idx: usize) -> Option<ClaimCotaNFTInfoReader<'r>> {
         if idx >= self.len() {
             None
         } else {
@@ -7031,10 +7219,10 @@ impl<'r> ClaimCotaNFTInfoVecReader<'r> {
         }
     }
 
-    pub fn get_unchecked(&self, idx: usize) -> CotaNFTInfoReader<'r> {
+    pub fn get_unchecked(&self, idx: usize) -> ClaimCotaNFTInfoReader<'r> {
         let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
         let end = start + Self::ITEM_SIZE;
-        CotaNFTInfoReader::new_unchecked(&self.as_slice()[start..end])
+        ClaimCotaNFTInfoReader::new_unchecked(&self.as_slice()[start..end])
     }
 }
 impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTInfoVecReader<'r> {
@@ -7075,28 +7263,31 @@ impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTInfoVecReader<'r> {
     }
 }
 #[derive(Debug, Default)]
-pub struct ClaimCotaNFTInfoVecBuilder(pub(crate) Vec<CotaNFTInfo>);
+pub struct ClaimCotaNFTInfoVecBuilder(pub(crate) Vec<ClaimCotaNFTInfo>);
 impl ClaimCotaNFTInfoVecBuilder {
-    pub const ITEM_SIZE: usize = 22;
+    pub const ITEM_SIZE: usize = 23;
 
-    pub fn set(mut self, v: Vec<CotaNFTInfo>) -> Self {
+    pub fn set(mut self, v: Vec<ClaimCotaNFTInfo>) -> Self {
         self.0 = v;
         self
     }
 
-    pub fn push(mut self, v: CotaNFTInfo) -> Self {
+    pub fn push(mut self, v: ClaimCotaNFTInfo) -> Self {
         self.0.push(v);
         self
     }
 
-    pub fn extend<T: ::core::iter::IntoIterator<Item = CotaNFTInfo>>(mut self, iter: T) -> Self {
+    pub fn extend<T: ::core::iter::IntoIterator<Item = ClaimCotaNFTInfo>>(
+        mut self,
+        iter: T,
+    ) -> Self {
         for elem in iter {
             self.0.push(elem);
         }
         self
     }
 
-    pub fn replace(&mut self, index: usize, v: CotaNFTInfo) -> Option<CotaNFTInfo> {
+    pub fn replace(&mut self, index: usize, v: ClaimCotaNFTInfo) -> Option<ClaimCotaNFTInfo> {
         self.0
             .get_mut(index)
             .map(|item| ::core::mem::replace(item, v))
@@ -7128,7 +7319,7 @@ impl molecule::prelude::Builder for ClaimCotaNFTInfoVecBuilder {
 }
 pub struct ClaimCotaNFTInfoVecIterator(ClaimCotaNFTInfoVec, usize, usize);
 impl ::core::iter::Iterator for ClaimCotaNFTInfoVecIterator {
-    type Item = CotaNFTInfo;
+    type Item = ClaimCotaNFTInfo;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 >= self.2 {
@@ -7147,7 +7338,7 @@ impl ::core::iter::ExactSizeIterator for ClaimCotaNFTInfoVecIterator {
 }
 impl ::core::iter::IntoIterator for ClaimCotaNFTInfoVec {
     type IntoIter = ClaimCotaNFTInfoVecIterator;
-    type Item = CotaNFTInfo;
+    type Item = ClaimCotaNFTInfo;
 
     fn into_iter(self) -> Self::IntoIter {
         let len = self.len();
@@ -7165,7 +7356,7 @@ pub struct ClaimCotaNFTInfoVecReaderIterator<'t, 'r>(
     usize,
 );
 impl<'t: 'r, 'r> ::core::iter::Iterator for ClaimCotaNFTInfoVecReaderIterator<'t, 'r> {
-    type Item = CotaNFTInfoReader<'t>;
+    type Item = ClaimCotaNFTInfoReader<'t>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 >= self.2 {
@@ -7178,6 +7369,1203 @@ impl<'t: 'r, 'r> ::core::iter::Iterator for ClaimCotaNFTInfoVecReaderIterator<'t
     }
 }
 impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator for ClaimCotaNFTInfoVecReaderIterator<'t, 'r> {
+    fn len(&self) -> usize {
+        self.2 - self.1
+    }
+}
+#[derive(Clone)]
+pub struct WithdrawalCotaNFTKeyV1(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for WithdrawalCotaNFTKeyV1 {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for WithdrawalCotaNFTKeyV1 {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for WithdrawalCotaNFTKeyV1 {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "nft_id", self.nft_id())?;
+        write!(f, ", {}: {}", "out_point", self.out_point())?;
+        write!(f, " }}")
+    }
+}
+impl ::core::default::Default for WithdrawalCotaNFTKeyV1 {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        WithdrawalCotaNFTKeyV1::new_unchecked(v.into())
+    }
+}
+impl WithdrawalCotaNFTKeyV1 {
+    pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [26, 24];
+    pub const TOTAL_SIZE: usize = 50;
+
+    pub fn nft_id(&self) -> CotaNFTId {
+        CotaNFTId::new_unchecked(self.0.slice(0..26))
+    }
+
+    pub fn out_point(&self) -> OutPointSlice {
+        OutPointSlice::new_unchecked(self.0.slice(26..50))
+    }
+
+    pub fn as_reader<'r>(&'r self) -> WithdrawalCotaNFTKeyV1Reader<'r> {
+        WithdrawalCotaNFTKeyV1Reader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for WithdrawalCotaNFTKeyV1 {
+    type Builder = WithdrawalCotaNFTKeyV1Builder;
+
+    const NAME: &'static str = "WithdrawalCotaNFTKeyV1";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        WithdrawalCotaNFTKeyV1(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        WithdrawalCotaNFTKeyV1Reader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        WithdrawalCotaNFTKeyV1Reader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder()
+            .nft_id(self.nft_id())
+            .out_point(self.out_point())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct WithdrawalCotaNFTKeyV1Reader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for WithdrawalCotaNFTKeyV1Reader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for WithdrawalCotaNFTKeyV1Reader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for WithdrawalCotaNFTKeyV1Reader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "nft_id", self.nft_id())?;
+        write!(f, ", {}: {}", "out_point", self.out_point())?;
+        write!(f, " }}")
+    }
+}
+impl<'r> WithdrawalCotaNFTKeyV1Reader<'r> {
+    pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [26, 24];
+    pub const TOTAL_SIZE: usize = 50;
+
+    pub fn nft_id(&self) -> CotaNFTIdReader<'r> {
+        CotaNFTIdReader::new_unchecked(&self.as_slice()[0..26])
+    }
+
+    pub fn out_point(&self) -> OutPointSliceReader<'r> {
+        OutPointSliceReader::new_unchecked(&self.as_slice()[26..50])
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for WithdrawalCotaNFTKeyV1Reader<'r> {
+    type Entity = WithdrawalCotaNFTKeyV1;
+
+    const NAME: &'static str = "WithdrawalCotaNFTKeyV1Reader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        WithdrawalCotaNFTKeyV1Reader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len != Self::TOTAL_SIZE {
+            return ve!(Self, TotalSizeNotMatch, Self::TOTAL_SIZE, slice_len);
+        }
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct WithdrawalCotaNFTKeyV1Builder {
+    pub(crate) nft_id:    CotaNFTId,
+    pub(crate) out_point: OutPointSlice,
+}
+impl WithdrawalCotaNFTKeyV1Builder {
+    pub const FIELD_COUNT: usize = 2;
+    pub const FIELD_SIZES: [usize; 2] = [26, 24];
+    pub const TOTAL_SIZE: usize = 50;
+
+    pub fn nft_id(mut self, v: CotaNFTId) -> Self {
+        self.nft_id = v;
+        self
+    }
+
+    pub fn out_point(mut self, v: OutPointSlice) -> Self {
+        self.out_point = v;
+        self
+    }
+}
+impl molecule::prelude::Builder for WithdrawalCotaNFTKeyV1Builder {
+    type Entity = WithdrawalCotaNFTKeyV1;
+
+    const NAME: &'static str = "WithdrawalCotaNFTKeyV1Builder";
+
+    fn expected_length(&self) -> usize {
+        Self::TOTAL_SIZE
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        writer.write_all(self.nft_id.as_slice())?;
+        writer.write_all(self.out_point.as_slice())?;
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        WithdrawalCotaNFTKeyV1::new_unchecked(inner.into())
+    }
+}
+#[derive(Clone)]
+pub struct WithdrawalCotaNFTKeyV1Vec(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for WithdrawalCotaNFTKeyV1Vec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for WithdrawalCotaNFTKeyV1Vec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for WithdrawalCotaNFTKeyV1Vec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} [", Self::NAME)?;
+        for i in 0..self.len() {
+            if i == 0 {
+                write!(f, "{}", self.get_unchecked(i))?;
+            } else {
+                write!(f, ", {}", self.get_unchecked(i))?;
+            }
+        }
+        write!(f, "]")
+    }
+}
+impl ::core::default::Default for WithdrawalCotaNFTKeyV1Vec {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![0, 0, 0, 0];
+        WithdrawalCotaNFTKeyV1Vec::new_unchecked(v.into())
+    }
+}
+impl WithdrawalCotaNFTKeyV1Vec {
+    pub const ITEM_SIZE: usize = 50;
+
+    pub fn total_size(&self) -> usize {
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
+    }
+
+    pub fn item_count(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn len(&self) -> usize {
+        self.item_count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn get(&self, idx: usize) -> Option<WithdrawalCotaNFTKeyV1> {
+        if idx >= self.len() {
+            None
+        } else {
+            Some(self.get_unchecked(idx))
+        }
+    }
+
+    pub fn get_unchecked(&self, idx: usize) -> WithdrawalCotaNFTKeyV1 {
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        WithdrawalCotaNFTKeyV1::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn as_reader<'r>(&'r self) -> WithdrawalCotaNFTKeyV1VecReader<'r> {
+        WithdrawalCotaNFTKeyV1VecReader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for WithdrawalCotaNFTKeyV1Vec {
+    type Builder = WithdrawalCotaNFTKeyV1VecBuilder;
+
+    const NAME: &'static str = "WithdrawalCotaNFTKeyV1Vec";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        WithdrawalCotaNFTKeyV1Vec(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        WithdrawalCotaNFTKeyV1VecReader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        WithdrawalCotaNFTKeyV1VecReader::from_compatible_slice(slice)
+            .map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder().extend(self.into_iter())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct WithdrawalCotaNFTKeyV1VecReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for WithdrawalCotaNFTKeyV1VecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for WithdrawalCotaNFTKeyV1VecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for WithdrawalCotaNFTKeyV1VecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} [", Self::NAME)?;
+        for i in 0..self.len() {
+            if i == 0 {
+                write!(f, "{}", self.get_unchecked(i))?;
+            } else {
+                write!(f, ", {}", self.get_unchecked(i))?;
+            }
+        }
+        write!(f, "]")
+    }
+}
+impl<'r> WithdrawalCotaNFTKeyV1VecReader<'r> {
+    pub const ITEM_SIZE: usize = 50;
+
+    pub fn total_size(&self) -> usize {
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
+    }
+
+    pub fn item_count(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn len(&self) -> usize {
+        self.item_count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn get(&self, idx: usize) -> Option<WithdrawalCotaNFTKeyV1Reader<'r>> {
+        if idx >= self.len() {
+            None
+        } else {
+            Some(self.get_unchecked(idx))
+        }
+    }
+
+    pub fn get_unchecked(&self, idx: usize) -> WithdrawalCotaNFTKeyV1Reader<'r> {
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        WithdrawalCotaNFTKeyV1Reader::new_unchecked(&self.as_slice()[start..end])
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for WithdrawalCotaNFTKeyV1VecReader<'r> {
+    type Entity = WithdrawalCotaNFTKeyV1Vec;
+
+    const NAME: &'static str = "WithdrawalCotaNFTKeyV1VecReader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        WithdrawalCotaNFTKeyV1VecReader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len < molecule::NUMBER_SIZE {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        }
+        let item_count = molecule::unpack_number(slice) as usize;
+        if item_count == 0 {
+            if slice_len != molecule::NUMBER_SIZE {
+                return ve!(Self, TotalSizeNotMatch, molecule::NUMBER_SIZE, slice_len);
+            }
+            return Ok(());
+        }
+        let total_size = molecule::NUMBER_SIZE + Self::ITEM_SIZE * item_count;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
+        }
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct WithdrawalCotaNFTKeyV1VecBuilder(pub(crate) Vec<WithdrawalCotaNFTKeyV1>);
+impl WithdrawalCotaNFTKeyV1VecBuilder {
+    pub const ITEM_SIZE: usize = 50;
+
+    pub fn set(mut self, v: Vec<WithdrawalCotaNFTKeyV1>) -> Self {
+        self.0 = v;
+        self
+    }
+
+    pub fn push(mut self, v: WithdrawalCotaNFTKeyV1) -> Self {
+        self.0.push(v);
+        self
+    }
+
+    pub fn extend<T: ::core::iter::IntoIterator<Item = WithdrawalCotaNFTKeyV1>>(
+        mut self,
+        iter: T,
+    ) -> Self {
+        for elem in iter {
+            self.0.push(elem);
+        }
+        self
+    }
+
+    pub fn replace(
+        &mut self,
+        index: usize,
+        v: WithdrawalCotaNFTKeyV1,
+    ) -> Option<WithdrawalCotaNFTKeyV1> {
+        self.0
+            .get_mut(index)
+            .map(|item| ::core::mem::replace(item, v))
+    }
+}
+impl molecule::prelude::Builder for WithdrawalCotaNFTKeyV1VecBuilder {
+    type Entity = WithdrawalCotaNFTKeyV1Vec;
+
+    const NAME: &'static str = "WithdrawalCotaNFTKeyV1VecBuilder";
+
+    fn expected_length(&self) -> usize {
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.0.len()
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        writer.write_all(&molecule::pack_number(self.0.len() as molecule::Number))?;
+        for inner in &self.0[..] {
+            writer.write_all(inner.as_slice())?;
+        }
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        WithdrawalCotaNFTKeyV1Vec::new_unchecked(inner.into())
+    }
+}
+pub struct WithdrawalCotaNFTKeyV1VecIterator(WithdrawalCotaNFTKeyV1Vec, usize, usize);
+impl ::core::iter::Iterator for WithdrawalCotaNFTKeyV1VecIterator {
+    type Item = WithdrawalCotaNFTKeyV1;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 >= self.2 {
+            None
+        } else {
+            let ret = self.0.get_unchecked(self.1);
+            self.1 += 1;
+            Some(ret)
+        }
+    }
+}
+impl ::core::iter::ExactSizeIterator for WithdrawalCotaNFTKeyV1VecIterator {
+    fn len(&self) -> usize {
+        self.2 - self.1
+    }
+}
+impl ::core::iter::IntoIterator for WithdrawalCotaNFTKeyV1Vec {
+    type IntoIter = WithdrawalCotaNFTKeyV1VecIterator;
+    type Item = WithdrawalCotaNFTKeyV1;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let len = self.len();
+        WithdrawalCotaNFTKeyV1VecIterator(self, 0, len)
+    }
+}
+impl<'r> WithdrawalCotaNFTKeyV1VecReader<'r> {
+    pub fn iter<'t>(&'t self) -> WithdrawalCotaNFTKeyV1VecReaderIterator<'t, 'r> {
+        WithdrawalCotaNFTKeyV1VecReaderIterator(&self, 0, self.len())
+    }
+}
+pub struct WithdrawalCotaNFTKeyV1VecReaderIterator<'t, 'r>(
+    &'t WithdrawalCotaNFTKeyV1VecReader<'r>,
+    usize,
+    usize,
+);
+impl<'t: 'r, 'r> ::core::iter::Iterator for WithdrawalCotaNFTKeyV1VecReaderIterator<'t, 'r> {
+    type Item = WithdrawalCotaNFTKeyV1Reader<'t>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 >= self.2 {
+            None
+        } else {
+            let ret = self.0.get_unchecked(self.1);
+            self.1 += 1;
+            Some(ret)
+        }
+    }
+}
+impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator
+    for WithdrawalCotaNFTKeyV1VecReaderIterator<'t, 'r>
+{
+    fn len(&self) -> usize {
+        self.2 - self.1
+    }
+}
+#[derive(Clone)]
+pub struct WithdrawalCotaNFTValueV1(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for WithdrawalCotaNFTValueV1 {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for WithdrawalCotaNFTValueV1 {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for WithdrawalCotaNFTValueV1 {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "nft_info", self.nft_info())?;
+        write!(f, ", {}: {}", "to_lock", self.to_lock())?;
+        let extra_count = self.count_extra_fields();
+        if extra_count != 0 {
+            write!(f, ", .. ({} fields)", extra_count)?;
+        }
+        write!(f, " }}")
+    }
+}
+impl ::core::default::Default for WithdrawalCotaNFTValueV1 {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![
+            38, 0, 0, 0, 12, 0, 0, 0, 34, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        WithdrawalCotaNFTValueV1::new_unchecked(v.into())
+    }
+}
+impl WithdrawalCotaNFTValueV1 {
+    pub const FIELD_COUNT: usize = 2;
+
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn field_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn count_extra_fields(&self) -> usize {
+        self.field_count() - Self::FIELD_COUNT
+    }
+
+    pub fn has_extra_fields(&self) -> bool {
+        Self::FIELD_COUNT != self.field_count()
+    }
+
+    pub fn nft_info(&self) -> CotaNFTInfo {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[4..]) as usize;
+        let end = molecule::unpack_number(&slice[8..]) as usize;
+        CotaNFTInfo::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn to_lock(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[8..]) as usize;
+        if self.has_extra_fields() {
+            let end = molecule::unpack_number(&slice[12..]) as usize;
+            Bytes::new_unchecked(self.0.slice(start..end))
+        } else {
+            Bytes::new_unchecked(self.0.slice(start..))
+        }
+    }
+
+    pub fn as_reader<'r>(&'r self) -> WithdrawalCotaNFTValueV1Reader<'r> {
+        WithdrawalCotaNFTValueV1Reader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for WithdrawalCotaNFTValueV1 {
+    type Builder = WithdrawalCotaNFTValueV1Builder;
+
+    const NAME: &'static str = "WithdrawalCotaNFTValueV1";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        WithdrawalCotaNFTValueV1(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        WithdrawalCotaNFTValueV1Reader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        WithdrawalCotaNFTValueV1Reader::from_compatible_slice(slice)
+            .map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder()
+            .nft_info(self.nft_info())
+            .to_lock(self.to_lock())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct WithdrawalCotaNFTValueV1Reader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for WithdrawalCotaNFTValueV1Reader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for WithdrawalCotaNFTValueV1Reader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for WithdrawalCotaNFTValueV1Reader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "nft_info", self.nft_info())?;
+        write!(f, ", {}: {}", "to_lock", self.to_lock())?;
+        let extra_count = self.count_extra_fields();
+        if extra_count != 0 {
+            write!(f, ", .. ({} fields)", extra_count)?;
+        }
+        write!(f, " }}")
+    }
+}
+impl<'r> WithdrawalCotaNFTValueV1Reader<'r> {
+    pub const FIELD_COUNT: usize = 2;
+
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn field_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn count_extra_fields(&self) -> usize {
+        self.field_count() - Self::FIELD_COUNT
+    }
+
+    pub fn has_extra_fields(&self) -> bool {
+        Self::FIELD_COUNT != self.field_count()
+    }
+
+    pub fn nft_info(&self) -> CotaNFTInfoReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[4..]) as usize;
+        let end = molecule::unpack_number(&slice[8..]) as usize;
+        CotaNFTInfoReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn to_lock(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[8..]) as usize;
+        if self.has_extra_fields() {
+            let end = molecule::unpack_number(&slice[12..]) as usize;
+            BytesReader::new_unchecked(&self.as_slice()[start..end])
+        } else {
+            BytesReader::new_unchecked(&self.as_slice()[start..])
+        }
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for WithdrawalCotaNFTValueV1Reader<'r> {
+    type Entity = WithdrawalCotaNFTValueV1;
+
+    const NAME: &'static str = "WithdrawalCotaNFTValueV1Reader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        WithdrawalCotaNFTValueV1Reader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len < molecule::NUMBER_SIZE {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        }
+        let total_size = molecule::unpack_number(slice) as usize;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
+        }
+        if slice_len == molecule::NUMBER_SIZE && Self::FIELD_COUNT == 0 {
+            return Ok(());
+        }
+        if slice_len < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE * 2, slice_len);
+        }
+        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
+        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        if slice_len < offset_first {
+            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
+        }
+        let field_count = offset_first / molecule::NUMBER_SIZE - 1;
+        if field_count < Self::FIELD_COUNT {
+            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
+        } else if !compatible && field_count > Self::FIELD_COUNT {
+            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
+        };
+        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
+            .chunks_exact(molecule::NUMBER_SIZE)
+            .map(|x| molecule::unpack_number(x) as usize)
+            .collect();
+        offsets.push(total_size);
+        if offsets.windows(2).any(|i| i[0] > i[1]) {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        CotaNFTInfoReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
+        BytesReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct WithdrawalCotaNFTValueV1Builder {
+    pub(crate) nft_info: CotaNFTInfo,
+    pub(crate) to_lock:  Bytes,
+}
+impl WithdrawalCotaNFTValueV1Builder {
+    pub const FIELD_COUNT: usize = 2;
+
+    pub fn nft_info(mut self, v: CotaNFTInfo) -> Self {
+        self.nft_info = v;
+        self
+    }
+
+    pub fn to_lock(mut self, v: Bytes) -> Self {
+        self.to_lock = v;
+        self
+    }
+}
+impl molecule::prelude::Builder for WithdrawalCotaNFTValueV1Builder {
+    type Entity = WithdrawalCotaNFTValueV1;
+
+    const NAME: &'static str = "WithdrawalCotaNFTValueV1Builder";
+
+    fn expected_length(&self) -> usize {
+        molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
+            + self.nft_info.as_slice().len()
+            + self.to_lock.as_slice().len()
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
+        let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
+        offsets.push(total_size);
+        total_size += self.nft_info.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.to_lock.as_slice().len();
+        writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
+        for offset in offsets.into_iter() {
+            writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
+        }
+        writer.write_all(self.nft_info.as_slice())?;
+        writer.write_all(self.to_lock.as_slice())?;
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        WithdrawalCotaNFTValueV1::new_unchecked(inner.into())
+    }
+}
+#[derive(Clone)]
+pub struct WithdrawalCotaNFTValueV1Vec(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for WithdrawalCotaNFTValueV1Vec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for WithdrawalCotaNFTValueV1Vec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for WithdrawalCotaNFTValueV1Vec {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} [", Self::NAME)?;
+        for i in 0..self.len() {
+            if i == 0 {
+                write!(f, "{}", self.get_unchecked(i))?;
+            } else {
+                write!(f, ", {}", self.get_unchecked(i))?;
+            }
+        }
+        write!(f, "]")
+    }
+}
+impl ::core::default::Default for WithdrawalCotaNFTValueV1Vec {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![4, 0, 0, 0];
+        WithdrawalCotaNFTValueV1Vec::new_unchecked(v.into())
+    }
+}
+impl WithdrawalCotaNFTValueV1Vec {
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn item_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.item_count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn get(&self, idx: usize) -> Option<WithdrawalCotaNFTValueV1> {
+        if idx >= self.len() {
+            None
+        } else {
+            Some(self.get_unchecked(idx))
+        }
+    }
+
+    pub fn get_unchecked(&self, idx: usize) -> WithdrawalCotaNFTValueV1 {
+        let slice = self.as_slice();
+        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
+        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
+        if idx == self.len() - 1 {
+            WithdrawalCotaNFTValueV1::new_unchecked(self.0.slice(start..))
+        } else {
+            let end_idx = start_idx + molecule::NUMBER_SIZE;
+            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
+            WithdrawalCotaNFTValueV1::new_unchecked(self.0.slice(start..end))
+        }
+    }
+
+    pub fn as_reader<'r>(&'r self) -> WithdrawalCotaNFTValueV1VecReader<'r> {
+        WithdrawalCotaNFTValueV1VecReader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for WithdrawalCotaNFTValueV1Vec {
+    type Builder = WithdrawalCotaNFTValueV1VecBuilder;
+
+    const NAME: &'static str = "WithdrawalCotaNFTValueV1Vec";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        WithdrawalCotaNFTValueV1Vec(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        WithdrawalCotaNFTValueV1VecReader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        WithdrawalCotaNFTValueV1VecReader::from_compatible_slice(slice)
+            .map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder().extend(self.into_iter())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct WithdrawalCotaNFTValueV1VecReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for WithdrawalCotaNFTValueV1VecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for WithdrawalCotaNFTValueV1VecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for WithdrawalCotaNFTValueV1VecReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} [", Self::NAME)?;
+        for i in 0..self.len() {
+            if i == 0 {
+                write!(f, "{}", self.get_unchecked(i))?;
+            } else {
+                write!(f, ", {}", self.get_unchecked(i))?;
+            }
+        }
+        write!(f, "]")
+    }
+}
+impl<'r> WithdrawalCotaNFTValueV1VecReader<'r> {
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn item_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn len(&self) -> usize {
+        self.item_count()
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.len() == 0
+    }
+
+    pub fn get(&self, idx: usize) -> Option<WithdrawalCotaNFTValueV1Reader<'r>> {
+        if idx >= self.len() {
+            None
+        } else {
+            Some(self.get_unchecked(idx))
+        }
+    }
+
+    pub fn get_unchecked(&self, idx: usize) -> WithdrawalCotaNFTValueV1Reader<'r> {
+        let slice = self.as_slice();
+        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
+        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
+        if idx == self.len() - 1 {
+            WithdrawalCotaNFTValueV1Reader::new_unchecked(&self.as_slice()[start..])
+        } else {
+            let end_idx = start_idx + molecule::NUMBER_SIZE;
+            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
+            WithdrawalCotaNFTValueV1Reader::new_unchecked(&self.as_slice()[start..end])
+        }
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for WithdrawalCotaNFTValueV1VecReader<'r> {
+    type Entity = WithdrawalCotaNFTValueV1Vec;
+
+    const NAME: &'static str = "WithdrawalCotaNFTValueV1VecReader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        WithdrawalCotaNFTValueV1VecReader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len < molecule::NUMBER_SIZE {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        }
+        let total_size = molecule::unpack_number(slice) as usize;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
+        }
+        if slice_len == molecule::NUMBER_SIZE {
+            return Ok(());
+        }
+        if slice_len < molecule::NUMBER_SIZE * 2 {
+            return ve!(
+                Self,
+                TotalSizeNotMatch,
+                molecule::NUMBER_SIZE * 2,
+                slice_len
+            );
+        }
+        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
+        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        if slice_len < offset_first {
+            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
+        }
+        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
+            .chunks_exact(molecule::NUMBER_SIZE)
+            .map(|x| molecule::unpack_number(x) as usize)
+            .collect();
+        offsets.push(total_size);
+        if offsets.windows(2).any(|i| i[0] > i[1]) {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        for pair in offsets.windows(2) {
+            let start = pair[0];
+            let end = pair[1];
+            WithdrawalCotaNFTValueV1Reader::verify(&slice[start..end], compatible)?;
+        }
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct WithdrawalCotaNFTValueV1VecBuilder(pub(crate) Vec<WithdrawalCotaNFTValueV1>);
+impl WithdrawalCotaNFTValueV1VecBuilder {
+    pub fn set(mut self, v: Vec<WithdrawalCotaNFTValueV1>) -> Self {
+        self.0 = v;
+        self
+    }
+
+    pub fn push(mut self, v: WithdrawalCotaNFTValueV1) -> Self {
+        self.0.push(v);
+        self
+    }
+
+    pub fn extend<T: ::core::iter::IntoIterator<Item = WithdrawalCotaNFTValueV1>>(
+        mut self,
+        iter: T,
+    ) -> Self {
+        for elem in iter {
+            self.0.push(elem);
+        }
+        self
+    }
+
+    pub fn replace(
+        &mut self,
+        index: usize,
+        v: WithdrawalCotaNFTValueV1,
+    ) -> Option<WithdrawalCotaNFTValueV1> {
+        self.0
+            .get_mut(index)
+            .map(|item| ::core::mem::replace(item, v))
+    }
+}
+impl molecule::prelude::Builder for WithdrawalCotaNFTValueV1VecBuilder {
+    type Entity = WithdrawalCotaNFTValueV1Vec;
+
+    const NAME: &'static str = "WithdrawalCotaNFTValueV1VecBuilder";
+
+    fn expected_length(&self) -> usize {
+        molecule::NUMBER_SIZE * (self.0.len() + 1)
+            + self
+                .0
+                .iter()
+                .map(|inner| inner.as_slice().len())
+                .sum::<usize>()
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        let item_count = self.0.len();
+        if item_count == 0 {
+            writer.write_all(&molecule::pack_number(
+                molecule::NUMBER_SIZE as molecule::Number,
+            ))?;
+        } else {
+            let (total_size, offsets) = self.0.iter().fold(
+                (
+                    molecule::NUMBER_SIZE * (item_count + 1),
+                    Vec::with_capacity(item_count),
+                ),
+                |(start, mut offsets), inner| {
+                    offsets.push(start);
+                    (start + inner.as_slice().len(), offsets)
+                },
+            );
+            writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
+            for offset in offsets.into_iter() {
+                writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
+            }
+            for inner in self.0.iter() {
+                writer.write_all(inner.as_slice())?;
+            }
+        }
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        WithdrawalCotaNFTValueV1Vec::new_unchecked(inner.into())
+    }
+}
+pub struct WithdrawalCotaNFTValueV1VecIterator(WithdrawalCotaNFTValueV1Vec, usize, usize);
+impl ::core::iter::Iterator for WithdrawalCotaNFTValueV1VecIterator {
+    type Item = WithdrawalCotaNFTValueV1;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 >= self.2 {
+            None
+        } else {
+            let ret = self.0.get_unchecked(self.1);
+            self.1 += 1;
+            Some(ret)
+        }
+    }
+}
+impl ::core::iter::ExactSizeIterator for WithdrawalCotaNFTValueV1VecIterator {
+    fn len(&self) -> usize {
+        self.2 - self.1
+    }
+}
+impl ::core::iter::IntoIterator for WithdrawalCotaNFTValueV1Vec {
+    type IntoIter = WithdrawalCotaNFTValueV1VecIterator;
+    type Item = WithdrawalCotaNFTValueV1;
+
+    fn into_iter(self) -> Self::IntoIter {
+        let len = self.len();
+        WithdrawalCotaNFTValueV1VecIterator(self, 0, len)
+    }
+}
+impl<'r> WithdrawalCotaNFTValueV1VecReader<'r> {
+    pub fn iter<'t>(&'t self) -> WithdrawalCotaNFTValueV1VecReaderIterator<'t, 'r> {
+        WithdrawalCotaNFTValueV1VecReaderIterator(&self, 0, self.len())
+    }
+}
+pub struct WithdrawalCotaNFTValueV1VecReaderIterator<'t, 'r>(
+    &'t WithdrawalCotaNFTValueV1VecReader<'r>,
+    usize,
+    usize,
+);
+impl<'t: 'r, 'r> ::core::iter::Iterator for WithdrawalCotaNFTValueV1VecReaderIterator<'t, 'r> {
+    type Item = WithdrawalCotaNFTValueV1Reader<'t>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        if self.1 >= self.2 {
+            None
+        } else {
+            let ret = self.0.get_unchecked(self.1);
+            self.1 += 1;
+            Some(ret)
+        }
+    }
+}
+impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator
+    for WithdrawalCotaNFTValueV1VecReaderIterator<'t, 'r>
+{
     fn len(&self) -> usize {
         self.2 - self.1
     }
