@@ -6,12 +6,12 @@
 pub mod common;
 pub mod define;
 pub mod mint;
+pub mod raw_tx;
 pub mod registry;
 pub mod smt;
 pub mod transfer;
 pub mod transfer_update;
 pub mod update;
-pub mod raw_tx;
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "std")] {
