@@ -3,6 +3,7 @@
 array Byte32 [byte; 32];
 array Uint16 [byte; 2];
 array Uint32 [byte; 4];
+array Uint64 [byte; 8];
 vector Bytes <byte>;
 
 array CotaId [byte; 20];
