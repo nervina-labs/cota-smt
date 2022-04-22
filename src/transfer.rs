@@ -11,6 +11,7 @@ pub use alloc::vec::*;
 // these lines above are manually added
 
 use super::common::*;
+use super::raw_tx::*;
 use molecule::prelude::*;
 #[derive(Clone)]
 pub struct WithdrawalCotaNFTEntries(molecule::bytes::Bytes);
@@ -2145,5 +2146,1058 @@ impl molecule::prelude::Builder for TransferCotaNFTV1EntriesBuilder {
         self.write(&mut inner)
             .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
         TransferCotaNFTV1Entries::new_unchecked(inner.into())
+    }
+}
+#[derive(Clone)]
+pub struct ClaimCotaNFTV2Entries(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for ClaimCotaNFTV2Entries {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for ClaimCotaNFTV2Entries {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for ClaimCotaNFTV2Entries {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "hold_keys", self.hold_keys())?;
+        write!(f, ", {}: {}", "hold_values", self.hold_values())?;
+        write!(f, ", {}: {}", "claim_keys", self.claim_keys())?;
+        write!(f, ", {}: {}", "claim_values", self.claim_values())?;
+        write!(f, ", {}: {}", "proof", self.proof())?;
+        write!(f, ", {}: {}", "withdrawal_proof", self.withdrawal_proof())?;
+        write!(f, ", {}: {}", "action", self.action())?;
+        write!(f, ", {}: {}", "raw_tx", self.raw_tx())?;
+        write!(f, ", {}: {}", "output_index", self.output_index())?;
+        write!(f, ", {}: {}", "tx_proof", self.tx_proof())?;
+        let extra_count = self.count_extra_fields();
+        if extra_count != 0 {
+            write!(f, ", .. ({} fields)", extra_count)?;
+        }
+        write!(f, " }}")
+    }
+}
+impl ::core::default::Default for ClaimCotaNFTV2Entries {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![
+            192, 0, 0, 0, 44, 0, 0, 0, 48, 0, 0, 0, 52, 0, 0, 0, 56, 0, 0, 0, 60, 0, 0, 0, 64, 0,
+            0, 0, 68, 0, 0, 0, 72, 0, 0, 0, 124, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 28, 0, 0, 0, 32,
+            0, 0, 0, 36, 0, 0, 0, 40, 0, 0, 0, 44, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 12, 0, 0, 0, 44,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 12, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        ClaimCotaNFTV2Entries::new_unchecked(v.into())
+    }
+}
+impl ClaimCotaNFTV2Entries {
+    pub const FIELD_COUNT: usize = 10;
+
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn field_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn count_extra_fields(&self) -> usize {
+        self.field_count() - Self::FIELD_COUNT
+    }
+
+    pub fn has_extra_fields(&self) -> bool {
+        Self::FIELD_COUNT != self.field_count()
+    }
+
+    pub fn hold_keys(&self) -> HoldCotaNFTKeyVec {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[4..]) as usize;
+        let end = molecule::unpack_number(&slice[8..]) as usize;
+        HoldCotaNFTKeyVec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn hold_values(&self) -> HoldCotaNFTValueVec {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[8..]) as usize;
+        let end = molecule::unpack_number(&slice[12..]) as usize;
+        HoldCotaNFTValueVec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn claim_keys(&self) -> ClaimCotaNFTKeyVec {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[12..]) as usize;
+        let end = molecule::unpack_number(&slice[16..]) as usize;
+        ClaimCotaNFTKeyVec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn claim_values(&self) -> ClaimCotaNFTValueVec {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
+        let end = molecule::unpack_number(&slice[20..]) as usize;
+        ClaimCotaNFTValueVec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn proof(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[20..]) as usize;
+        let end = molecule::unpack_number(&slice[24..]) as usize;
+        Bytes::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn withdrawal_proof(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[24..]) as usize;
+        let end = molecule::unpack_number(&slice[28..]) as usize;
+        Bytes::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn action(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[28..]) as usize;
+        let end = molecule::unpack_number(&slice[32..]) as usize;
+        Bytes::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn raw_tx(&self) -> RawTransaction {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[32..]) as usize;
+        let end = molecule::unpack_number(&slice[36..]) as usize;
+        RawTransaction::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn output_index(&self) -> Uint32 {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[36..]) as usize;
+        let end = molecule::unpack_number(&slice[40..]) as usize;
+        Uint32::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn tx_proof(&self) -> TransactionProof {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[40..]) as usize;
+        if self.has_extra_fields() {
+            let end = molecule::unpack_number(&slice[44..]) as usize;
+            TransactionProof::new_unchecked(self.0.slice(start..end))
+        } else {
+            TransactionProof::new_unchecked(self.0.slice(start..))
+        }
+    }
+
+    pub fn as_reader<'r>(&'r self) -> ClaimCotaNFTV2EntriesReader<'r> {
+        ClaimCotaNFTV2EntriesReader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for ClaimCotaNFTV2Entries {
+    type Builder = ClaimCotaNFTV2EntriesBuilder;
+
+    const NAME: &'static str = "ClaimCotaNFTV2Entries";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        ClaimCotaNFTV2Entries(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        ClaimCotaNFTV2EntriesReader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        ClaimCotaNFTV2EntriesReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder()
+            .hold_keys(self.hold_keys())
+            .hold_values(self.hold_values())
+            .claim_keys(self.claim_keys())
+            .claim_values(self.claim_values())
+            .proof(self.proof())
+            .withdrawal_proof(self.withdrawal_proof())
+            .action(self.action())
+            .raw_tx(self.raw_tx())
+            .output_index(self.output_index())
+            .tx_proof(self.tx_proof())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct ClaimCotaNFTV2EntriesReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for ClaimCotaNFTV2EntriesReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for ClaimCotaNFTV2EntriesReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for ClaimCotaNFTV2EntriesReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "hold_keys", self.hold_keys())?;
+        write!(f, ", {}: {}", "hold_values", self.hold_values())?;
+        write!(f, ", {}: {}", "claim_keys", self.claim_keys())?;
+        write!(f, ", {}: {}", "claim_values", self.claim_values())?;
+        write!(f, ", {}: {}", "proof", self.proof())?;
+        write!(f, ", {}: {}", "withdrawal_proof", self.withdrawal_proof())?;
+        write!(f, ", {}: {}", "action", self.action())?;
+        write!(f, ", {}: {}", "raw_tx", self.raw_tx())?;
+        write!(f, ", {}: {}", "output_index", self.output_index())?;
+        write!(f, ", {}: {}", "tx_proof", self.tx_proof())?;
+        let extra_count = self.count_extra_fields();
+        if extra_count != 0 {
+            write!(f, ", .. ({} fields)", extra_count)?;
+        }
+        write!(f, " }}")
+    }
+}
+impl<'r> ClaimCotaNFTV2EntriesReader<'r> {
+    pub const FIELD_COUNT: usize = 10;
+
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn field_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn count_extra_fields(&self) -> usize {
+        self.field_count() - Self::FIELD_COUNT
+    }
+
+    pub fn has_extra_fields(&self) -> bool {
+        Self::FIELD_COUNT != self.field_count()
+    }
+
+    pub fn hold_keys(&self) -> HoldCotaNFTKeyVecReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[4..]) as usize;
+        let end = molecule::unpack_number(&slice[8..]) as usize;
+        HoldCotaNFTKeyVecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn hold_values(&self) -> HoldCotaNFTValueVecReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[8..]) as usize;
+        let end = molecule::unpack_number(&slice[12..]) as usize;
+        HoldCotaNFTValueVecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn claim_keys(&self) -> ClaimCotaNFTKeyVecReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[12..]) as usize;
+        let end = molecule::unpack_number(&slice[16..]) as usize;
+        ClaimCotaNFTKeyVecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn claim_values(&self) -> ClaimCotaNFTValueVecReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
+        let end = molecule::unpack_number(&slice[20..]) as usize;
+        ClaimCotaNFTValueVecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn proof(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[20..]) as usize;
+        let end = molecule::unpack_number(&slice[24..]) as usize;
+        BytesReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn withdrawal_proof(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[24..]) as usize;
+        let end = molecule::unpack_number(&slice[28..]) as usize;
+        BytesReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn action(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[28..]) as usize;
+        let end = molecule::unpack_number(&slice[32..]) as usize;
+        BytesReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn raw_tx(&self) -> RawTransactionReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[32..]) as usize;
+        let end = molecule::unpack_number(&slice[36..]) as usize;
+        RawTransactionReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn output_index(&self) -> Uint32Reader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[36..]) as usize;
+        let end = molecule::unpack_number(&slice[40..]) as usize;
+        Uint32Reader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn tx_proof(&self) -> TransactionProofReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[40..]) as usize;
+        if self.has_extra_fields() {
+            let end = molecule::unpack_number(&slice[44..]) as usize;
+            TransactionProofReader::new_unchecked(&self.as_slice()[start..end])
+        } else {
+            TransactionProofReader::new_unchecked(&self.as_slice()[start..])
+        }
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for ClaimCotaNFTV2EntriesReader<'r> {
+    type Entity = ClaimCotaNFTV2Entries;
+
+    const NAME: &'static str = "ClaimCotaNFTV2EntriesReader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        ClaimCotaNFTV2EntriesReader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len < molecule::NUMBER_SIZE {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        }
+        let total_size = molecule::unpack_number(slice) as usize;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
+        }
+        if slice_len == molecule::NUMBER_SIZE && Self::FIELD_COUNT == 0 {
+            return Ok(());
+        }
+        if slice_len < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE * 2, slice_len);
+        }
+        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
+        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        if slice_len < offset_first {
+            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
+        }
+        let field_count = offset_first / molecule::NUMBER_SIZE - 1;
+        if field_count < Self::FIELD_COUNT {
+            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
+        } else if !compatible && field_count > Self::FIELD_COUNT {
+            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
+        };
+        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
+            .chunks_exact(molecule::NUMBER_SIZE)
+            .map(|x| molecule::unpack_number(x) as usize)
+            .collect();
+        offsets.push(total_size);
+        if offsets.windows(2).any(|i| i[0] > i[1]) {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        HoldCotaNFTKeyVecReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
+        HoldCotaNFTValueVecReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
+        ClaimCotaNFTKeyVecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
+        ClaimCotaNFTValueVecReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
+        BytesReader::verify(&slice[offsets[4]..offsets[5]], compatible)?;
+        BytesReader::verify(&slice[offsets[5]..offsets[6]], compatible)?;
+        BytesReader::verify(&slice[offsets[6]..offsets[7]], compatible)?;
+        RawTransactionReader::verify(&slice[offsets[7]..offsets[8]], compatible)?;
+        Uint32Reader::verify(&slice[offsets[8]..offsets[9]], compatible)?;
+        TransactionProofReader::verify(&slice[offsets[9]..offsets[10]], compatible)?;
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct ClaimCotaNFTV2EntriesBuilder {
+    pub(crate) hold_keys:        HoldCotaNFTKeyVec,
+    pub(crate) hold_values:      HoldCotaNFTValueVec,
+    pub(crate) claim_keys:       ClaimCotaNFTKeyVec,
+    pub(crate) claim_values:     ClaimCotaNFTValueVec,
+    pub(crate) proof:            Bytes,
+    pub(crate) withdrawal_proof: Bytes,
+    pub(crate) action:           Bytes,
+    pub(crate) raw_tx:           RawTransaction,
+    pub(crate) output_index:     Uint32,
+    pub(crate) tx_proof:         TransactionProof,
+}
+impl ClaimCotaNFTV2EntriesBuilder {
+    pub const FIELD_COUNT: usize = 10;
+
+    pub fn hold_keys(mut self, v: HoldCotaNFTKeyVec) -> Self {
+        self.hold_keys = v;
+        self
+    }
+
+    pub fn hold_values(mut self, v: HoldCotaNFTValueVec) -> Self {
+        self.hold_values = v;
+        self
+    }
+
+    pub fn claim_keys(mut self, v: ClaimCotaNFTKeyVec) -> Self {
+        self.claim_keys = v;
+        self
+    }
+
+    pub fn claim_values(mut self, v: ClaimCotaNFTValueVec) -> Self {
+        self.claim_values = v;
+        self
+    }
+
+    pub fn proof(mut self, v: Bytes) -> Self {
+        self.proof = v;
+        self
+    }
+
+    pub fn withdrawal_proof(mut self, v: Bytes) -> Self {
+        self.withdrawal_proof = v;
+        self
+    }
+
+    pub fn action(mut self, v: Bytes) -> Self {
+        self.action = v;
+        self
+    }
+
+    pub fn raw_tx(mut self, v: RawTransaction) -> Self {
+        self.raw_tx = v;
+        self
+    }
+
+    pub fn output_index(mut self, v: Uint32) -> Self {
+        self.output_index = v;
+        self
+    }
+
+    pub fn tx_proof(mut self, v: TransactionProof) -> Self {
+        self.tx_proof = v;
+        self
+    }
+}
+impl molecule::prelude::Builder for ClaimCotaNFTV2EntriesBuilder {
+    type Entity = ClaimCotaNFTV2Entries;
+
+    const NAME: &'static str = "ClaimCotaNFTV2EntriesBuilder";
+
+    fn expected_length(&self) -> usize {
+        molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
+            + self.hold_keys.as_slice().len()
+            + self.hold_values.as_slice().len()
+            + self.claim_keys.as_slice().len()
+            + self.claim_values.as_slice().len()
+            + self.proof.as_slice().len()
+            + self.withdrawal_proof.as_slice().len()
+            + self.action.as_slice().len()
+            + self.raw_tx.as_slice().len()
+            + self.output_index.as_slice().len()
+            + self.tx_proof.as_slice().len()
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
+        let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
+        offsets.push(total_size);
+        total_size += self.hold_keys.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.hold_values.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.claim_keys.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.claim_values.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.proof.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.withdrawal_proof.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.action.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.raw_tx.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.output_index.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.tx_proof.as_slice().len();
+        writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
+        for offset in offsets.into_iter() {
+            writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
+        }
+        writer.write_all(self.hold_keys.as_slice())?;
+        writer.write_all(self.hold_values.as_slice())?;
+        writer.write_all(self.claim_keys.as_slice())?;
+        writer.write_all(self.claim_values.as_slice())?;
+        writer.write_all(self.proof.as_slice())?;
+        writer.write_all(self.withdrawal_proof.as_slice())?;
+        writer.write_all(self.action.as_slice())?;
+        writer.write_all(self.raw_tx.as_slice())?;
+        writer.write_all(self.output_index.as_slice())?;
+        writer.write_all(self.tx_proof.as_slice())?;
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        ClaimCotaNFTV2Entries::new_unchecked(inner.into())
+    }
+}
+#[derive(Clone)]
+pub struct TransferCotaNFTV2Entries(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for TransferCotaNFTV2Entries {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl ::core::fmt::Debug for TransferCotaNFTV2Entries {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl ::core::fmt::Display for TransferCotaNFTV2Entries {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "claim_keys", self.claim_keys())?;
+        write!(f, ", {}: {}", "claim_values", self.claim_values())?;
+        write!(f, ", {}: {}", "withdrawal_keys", self.withdrawal_keys())?;
+        write!(f, ", {}: {}", "withdrawal_values", self.withdrawal_values())?;
+        write!(f, ", {}: {}", "proof", self.proof())?;
+        write!(f, ", {}: {}", "withdrawal_proof", self.withdrawal_proof())?;
+        write!(f, ", {}: {}", "action", self.action())?;
+        write!(f, ", {}: {}", "raw_tx", self.raw_tx())?;
+        write!(f, ", {}: {}", "output_index", self.output_index())?;
+        write!(f, ", {}: {}", "tx_proof", self.tx_proof())?;
+        let extra_count = self.count_extra_fields();
+        if extra_count != 0 {
+            write!(f, ", .. ({} fields)", extra_count)?;
+        }
+        write!(f, " }}")
+    }
+}
+impl ::core::default::Default for TransferCotaNFTV2Entries {
+    fn default() -> Self {
+        let v: Vec<u8> = vec![
+            192, 0, 0, 0, 44, 0, 0, 0, 48, 0, 0, 0, 52, 0, 0, 0, 56, 0, 0, 0, 60, 0, 0, 0, 64, 0,
+            0, 0, 68, 0, 0, 0, 72, 0, 0, 0, 124, 0, 0, 0, 128, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 52, 0, 0, 0, 28, 0, 0, 0, 32,
+            0, 0, 0, 36, 0, 0, 0, 40, 0, 0, 0, 44, 0, 0, 0, 48, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 12, 0, 0, 0, 44,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 12, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        TransferCotaNFTV2Entries::new_unchecked(v.into())
+    }
+}
+impl TransferCotaNFTV2Entries {
+    pub const FIELD_COUNT: usize = 10;
+
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn field_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn count_extra_fields(&self) -> usize {
+        self.field_count() - Self::FIELD_COUNT
+    }
+
+    pub fn has_extra_fields(&self) -> bool {
+        Self::FIELD_COUNT != self.field_count()
+    }
+
+    pub fn claim_keys(&self) -> ClaimCotaNFTKeyVec {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[4..]) as usize;
+        let end = molecule::unpack_number(&slice[8..]) as usize;
+        ClaimCotaNFTKeyVec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn claim_values(&self) -> ClaimCotaNFTValueVec {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[8..]) as usize;
+        let end = molecule::unpack_number(&slice[12..]) as usize;
+        ClaimCotaNFTValueVec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn withdrawal_keys(&self) -> WithdrawalCotaNFTKeyV1Vec {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[12..]) as usize;
+        let end = molecule::unpack_number(&slice[16..]) as usize;
+        WithdrawalCotaNFTKeyV1Vec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn withdrawal_values(&self) -> WithdrawalCotaNFTValueV1Vec {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
+        let end = molecule::unpack_number(&slice[20..]) as usize;
+        WithdrawalCotaNFTValueV1Vec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn proof(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[20..]) as usize;
+        let end = molecule::unpack_number(&slice[24..]) as usize;
+        Bytes::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn withdrawal_proof(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[24..]) as usize;
+        let end = molecule::unpack_number(&slice[28..]) as usize;
+        Bytes::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn action(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[28..]) as usize;
+        let end = molecule::unpack_number(&slice[32..]) as usize;
+        Bytes::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn raw_tx(&self) -> RawTransaction {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[32..]) as usize;
+        let end = molecule::unpack_number(&slice[36..]) as usize;
+        RawTransaction::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn output_index(&self) -> Uint32 {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[36..]) as usize;
+        let end = molecule::unpack_number(&slice[40..]) as usize;
+        Uint32::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn tx_proof(&self) -> TransactionProof {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[40..]) as usize;
+        if self.has_extra_fields() {
+            let end = molecule::unpack_number(&slice[44..]) as usize;
+            TransactionProof::new_unchecked(self.0.slice(start..end))
+        } else {
+            TransactionProof::new_unchecked(self.0.slice(start..))
+        }
+    }
+
+    pub fn as_reader<'r>(&'r self) -> TransferCotaNFTV2EntriesReader<'r> {
+        TransferCotaNFTV2EntriesReader::new_unchecked(self.as_slice())
+    }
+}
+impl molecule::prelude::Entity for TransferCotaNFTV2Entries {
+    type Builder = TransferCotaNFTV2EntriesBuilder;
+
+    const NAME: &'static str = "TransferCotaNFTV2Entries";
+
+    fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
+        TransferCotaNFTV2Entries(data)
+    }
+
+    fn as_bytes(&self) -> molecule::bytes::Bytes {
+        self.0.clone()
+    }
+
+    fn as_slice(&self) -> &[u8] {
+        &self.0[..]
+    }
+
+    fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        TransferCotaNFTV2EntriesReader::from_slice(slice).map(|reader| reader.to_entity())
+    }
+
+    fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
+        TransferCotaNFTV2EntriesReader::from_compatible_slice(slice)
+            .map(|reader| reader.to_entity())
+    }
+
+    fn new_builder() -> Self::Builder {
+        ::core::default::Default::default()
+    }
+
+    fn as_builder(self) -> Self::Builder {
+        Self::new_builder()
+            .claim_keys(self.claim_keys())
+            .claim_values(self.claim_values())
+            .withdrawal_keys(self.withdrawal_keys())
+            .withdrawal_values(self.withdrawal_values())
+            .proof(self.proof())
+            .withdrawal_proof(self.withdrawal_proof())
+            .action(self.action())
+            .raw_tx(self.raw_tx())
+            .output_index(self.output_index())
+            .tx_proof(self.tx_proof())
+    }
+}
+#[derive(Clone, Copy)]
+pub struct TransferCotaNFTV2EntriesReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for TransferCotaNFTV2EntriesReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        use molecule::hex_string;
+        if f.alternate() {
+            write!(f, "0x")?;
+        }
+        write!(f, "{}", hex_string(self.as_slice()))
+    }
+}
+impl<'r> ::core::fmt::Debug for TransferCotaNFTV2EntriesReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{}({:#x})", Self::NAME, self)
+    }
+}
+impl<'r> ::core::fmt::Display for TransferCotaNFTV2EntriesReader<'r> {
+    fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "claim_keys", self.claim_keys())?;
+        write!(f, ", {}: {}", "claim_values", self.claim_values())?;
+        write!(f, ", {}: {}", "withdrawal_keys", self.withdrawal_keys())?;
+        write!(f, ", {}: {}", "withdrawal_values", self.withdrawal_values())?;
+        write!(f, ", {}: {}", "proof", self.proof())?;
+        write!(f, ", {}: {}", "withdrawal_proof", self.withdrawal_proof())?;
+        write!(f, ", {}: {}", "action", self.action())?;
+        write!(f, ", {}: {}", "raw_tx", self.raw_tx())?;
+        write!(f, ", {}: {}", "output_index", self.output_index())?;
+        write!(f, ", {}: {}", "tx_proof", self.tx_proof())?;
+        let extra_count = self.count_extra_fields();
+        if extra_count != 0 {
+            write!(f, ", .. ({} fields)", extra_count)?;
+        }
+        write!(f, " }}")
+    }
+}
+impl<'r> TransferCotaNFTV2EntriesReader<'r> {
+    pub const FIELD_COUNT: usize = 10;
+
+    pub fn total_size(&self) -> usize {
+        molecule::unpack_number(self.as_slice()) as usize
+    }
+
+    pub fn field_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
+    }
+
+    pub fn count_extra_fields(&self) -> usize {
+        self.field_count() - Self::FIELD_COUNT
+    }
+
+    pub fn has_extra_fields(&self) -> bool {
+        Self::FIELD_COUNT != self.field_count()
+    }
+
+    pub fn claim_keys(&self) -> ClaimCotaNFTKeyVecReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[4..]) as usize;
+        let end = molecule::unpack_number(&slice[8..]) as usize;
+        ClaimCotaNFTKeyVecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn claim_values(&self) -> ClaimCotaNFTValueVecReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[8..]) as usize;
+        let end = molecule::unpack_number(&slice[12..]) as usize;
+        ClaimCotaNFTValueVecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn withdrawal_keys(&self) -> WithdrawalCotaNFTKeyV1VecReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[12..]) as usize;
+        let end = molecule::unpack_number(&slice[16..]) as usize;
+        WithdrawalCotaNFTKeyV1VecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn withdrawal_values(&self) -> WithdrawalCotaNFTValueV1VecReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
+        let end = molecule::unpack_number(&slice[20..]) as usize;
+        WithdrawalCotaNFTValueV1VecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn proof(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[20..]) as usize;
+        let end = molecule::unpack_number(&slice[24..]) as usize;
+        BytesReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn withdrawal_proof(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[24..]) as usize;
+        let end = molecule::unpack_number(&slice[28..]) as usize;
+        BytesReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn action(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[28..]) as usize;
+        let end = molecule::unpack_number(&slice[32..]) as usize;
+        BytesReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn raw_tx(&self) -> RawTransactionReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[32..]) as usize;
+        let end = molecule::unpack_number(&slice[36..]) as usize;
+        RawTransactionReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn output_index(&self) -> Uint32Reader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[36..]) as usize;
+        let end = molecule::unpack_number(&slice[40..]) as usize;
+        Uint32Reader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn tx_proof(&self) -> TransactionProofReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[40..]) as usize;
+        if self.has_extra_fields() {
+            let end = molecule::unpack_number(&slice[44..]) as usize;
+            TransactionProofReader::new_unchecked(&self.as_slice()[start..end])
+        } else {
+            TransactionProofReader::new_unchecked(&self.as_slice()[start..])
+        }
+    }
+}
+impl<'r> molecule::prelude::Reader<'r> for TransferCotaNFTV2EntriesReader<'r> {
+    type Entity = TransferCotaNFTV2Entries;
+
+    const NAME: &'static str = "TransferCotaNFTV2EntriesReader";
+
+    fn to_entity(&self) -> Self::Entity {
+        Self::Entity::new_unchecked(self.as_slice().to_owned().into())
+    }
+
+    fn new_unchecked(slice: &'r [u8]) -> Self {
+        TransferCotaNFTV2EntriesReader(slice)
+    }
+
+    fn as_slice(&self) -> &'r [u8] {
+        self.0
+    }
+
+    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+        use molecule::verification_error as ve;
+        let slice_len = slice.len();
+        if slice_len < molecule::NUMBER_SIZE {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        }
+        let total_size = molecule::unpack_number(slice) as usize;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
+        }
+        if slice_len == molecule::NUMBER_SIZE && Self::FIELD_COUNT == 0 {
+            return Ok(());
+        }
+        if slice_len < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE * 2, slice_len);
+        }
+        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
+        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        if slice_len < offset_first {
+            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
+        }
+        let field_count = offset_first / molecule::NUMBER_SIZE - 1;
+        if field_count < Self::FIELD_COUNT {
+            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
+        } else if !compatible && field_count > Self::FIELD_COUNT {
+            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
+        };
+        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
+            .chunks_exact(molecule::NUMBER_SIZE)
+            .map(|x| molecule::unpack_number(x) as usize)
+            .collect();
+        offsets.push(total_size);
+        if offsets.windows(2).any(|i| i[0] > i[1]) {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        ClaimCotaNFTKeyVecReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
+        ClaimCotaNFTValueVecReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
+        WithdrawalCotaNFTKeyV1VecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
+        WithdrawalCotaNFTValueV1VecReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
+        BytesReader::verify(&slice[offsets[4]..offsets[5]], compatible)?;
+        BytesReader::verify(&slice[offsets[5]..offsets[6]], compatible)?;
+        BytesReader::verify(&slice[offsets[6]..offsets[7]], compatible)?;
+        RawTransactionReader::verify(&slice[offsets[7]..offsets[8]], compatible)?;
+        Uint32Reader::verify(&slice[offsets[8]..offsets[9]], compatible)?;
+        TransactionProofReader::verify(&slice[offsets[9]..offsets[10]], compatible)?;
+        Ok(())
+    }
+}
+#[derive(Debug, Default)]
+pub struct TransferCotaNFTV2EntriesBuilder {
+    pub(crate) claim_keys:        ClaimCotaNFTKeyVec,
+    pub(crate) claim_values:      ClaimCotaNFTValueVec,
+    pub(crate) withdrawal_keys:   WithdrawalCotaNFTKeyV1Vec,
+    pub(crate) withdrawal_values: WithdrawalCotaNFTValueV1Vec,
+    pub(crate) proof:             Bytes,
+    pub(crate) withdrawal_proof:  Bytes,
+    pub(crate) action:            Bytes,
+    pub(crate) raw_tx:            RawTransaction,
+    pub(crate) output_index:      Uint32,
+    pub(crate) tx_proof:          TransactionProof,
+}
+impl TransferCotaNFTV2EntriesBuilder {
+    pub const FIELD_COUNT: usize = 10;
+
+    pub fn claim_keys(mut self, v: ClaimCotaNFTKeyVec) -> Self {
+        self.claim_keys = v;
+        self
+    }
+
+    pub fn claim_values(mut self, v: ClaimCotaNFTValueVec) -> Self {
+        self.claim_values = v;
+        self
+    }
+
+    pub fn withdrawal_keys(mut self, v: WithdrawalCotaNFTKeyV1Vec) -> Self {
+        self.withdrawal_keys = v;
+        self
+    }
+
+    pub fn withdrawal_values(mut self, v: WithdrawalCotaNFTValueV1Vec) -> Self {
+        self.withdrawal_values = v;
+        self
+    }
+
+    pub fn proof(mut self, v: Bytes) -> Self {
+        self.proof = v;
+        self
+    }
+
+    pub fn withdrawal_proof(mut self, v: Bytes) -> Self {
+        self.withdrawal_proof = v;
+        self
+    }
+
+    pub fn action(mut self, v: Bytes) -> Self {
+        self.action = v;
+        self
+    }
+
+    pub fn raw_tx(mut self, v: RawTransaction) -> Self {
+        self.raw_tx = v;
+        self
+    }
+
+    pub fn output_index(mut self, v: Uint32) -> Self {
+        self.output_index = v;
+        self
+    }
+
+    pub fn tx_proof(mut self, v: TransactionProof) -> Self {
+        self.tx_proof = v;
+        self
+    }
+}
+impl molecule::prelude::Builder for TransferCotaNFTV2EntriesBuilder {
+    type Entity = TransferCotaNFTV2Entries;
+
+    const NAME: &'static str = "TransferCotaNFTV2EntriesBuilder";
+
+    fn expected_length(&self) -> usize {
+        molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
+            + self.claim_keys.as_slice().len()
+            + self.claim_values.as_slice().len()
+            + self.withdrawal_keys.as_slice().len()
+            + self.withdrawal_values.as_slice().len()
+            + self.proof.as_slice().len()
+            + self.withdrawal_proof.as_slice().len()
+            + self.action.as_slice().len()
+            + self.raw_tx.as_slice().len()
+            + self.output_index.as_slice().len()
+            + self.tx_proof.as_slice().len()
+    }
+
+    fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
+        let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
+        let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
+        offsets.push(total_size);
+        total_size += self.claim_keys.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.claim_values.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.withdrawal_keys.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.withdrawal_values.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.proof.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.withdrawal_proof.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.action.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.raw_tx.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.output_index.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.tx_proof.as_slice().len();
+        writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
+        for offset in offsets.into_iter() {
+            writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
+        }
+        writer.write_all(self.claim_keys.as_slice())?;
+        writer.write_all(self.claim_values.as_slice())?;
+        writer.write_all(self.withdrawal_keys.as_slice())?;
+        writer.write_all(self.withdrawal_values.as_slice())?;
+        writer.write_all(self.proof.as_slice())?;
+        writer.write_all(self.withdrawal_proof.as_slice())?;
+        writer.write_all(self.action.as_slice())?;
+        writer.write_all(self.raw_tx.as_slice())?;
+        writer.write_all(self.output_index.as_slice())?;
+        writer.write_all(self.tx_proof.as_slice())?;
+        Ok(())
+    }
+
+    fn build(&self) -> Self::Entity {
+        let mut inner = Vec::with_capacity(self.expected_length());
+        self.write(&mut inner)
+            .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
+        TransferCotaNFTV2Entries::new_unchecked(inner.into())
     }
 }
