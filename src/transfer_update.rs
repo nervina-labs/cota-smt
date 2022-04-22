@@ -1944,18 +1944,18 @@ impl TransferUpdateCotaNFTV2Entries {
         ClaimCotaNFTInfoVec::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn withdrawal_keys(&self) -> WithdrawalCotaNFTKeyVec {
+    pub fn withdrawal_keys(&self) -> WithdrawalCotaNFTKeyV1Vec {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
         let end = molecule::unpack_number(&slice[16..]) as usize;
-        WithdrawalCotaNFTKeyVec::new_unchecked(self.0.slice(start..end))
+        WithdrawalCotaNFTKeyV1Vec::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn withdrawal_values(&self) -> WithdrawalCotaNFTValueVec {
+    pub fn withdrawal_values(&self) -> WithdrawalCotaNFTValueV1Vec {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[16..]) as usize;
         let end = molecule::unpack_number(&slice[20..]) as usize;
-        WithdrawalCotaNFTValueVec::new_unchecked(self.0.slice(start..end))
+        WithdrawalCotaNFTValueV1Vec::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn proof(&self) -> Bytes {
@@ -2125,18 +2125,18 @@ impl<'r> TransferUpdateCotaNFTV2EntriesReader<'r> {
         ClaimCotaNFTInfoVecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn withdrawal_keys(&self) -> WithdrawalCotaNFTKeyVecReader<'r> {
+    pub fn withdrawal_keys(&self) -> WithdrawalCotaNFTKeyV1VecReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
         let end = molecule::unpack_number(&slice[16..]) as usize;
-        WithdrawalCotaNFTKeyVecReader::new_unchecked(&self.as_slice()[start..end])
+        WithdrawalCotaNFTKeyV1VecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn withdrawal_values(&self) -> WithdrawalCotaNFTValueVecReader<'r> {
+    pub fn withdrawal_values(&self) -> WithdrawalCotaNFTValueV1VecReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[16..]) as usize;
         let end = molecule::unpack_number(&slice[20..]) as usize;
-        WithdrawalCotaNFTValueVecReader::new_unchecked(&self.as_slice()[start..end])
+        WithdrawalCotaNFTValueV1VecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
     pub fn proof(&self) -> BytesReader<'r> {
@@ -2241,8 +2241,8 @@ impl<'r> molecule::prelude::Reader<'r> for TransferUpdateCotaNFTV2EntriesReader<
         }
         ClaimCotaNFTKeyVecReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
         ClaimCotaNFTInfoVecReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
-        WithdrawalCotaNFTKeyVecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
-        WithdrawalCotaNFTValueVecReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
+        WithdrawalCotaNFTKeyV1VecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
+        WithdrawalCotaNFTValueV1VecReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
         BytesReader::verify(&slice[offsets[4]..offsets[5]], compatible)?;
         BytesReader::verify(&slice[offsets[5]..offsets[6]], compatible)?;
         BytesReader::verify(&slice[offsets[6]..offsets[7]], compatible)?;
@@ -2256,8 +2256,8 @@ impl<'r> molecule::prelude::Reader<'r> for TransferUpdateCotaNFTV2EntriesReader<
 pub struct TransferUpdateCotaNFTV2EntriesBuilder {
     pub(crate) claim_keys:        ClaimCotaNFTKeyVec,
     pub(crate) claim_infos:       ClaimCotaNFTInfoVec,
-    pub(crate) withdrawal_keys:   WithdrawalCotaNFTKeyVec,
-    pub(crate) withdrawal_values: WithdrawalCotaNFTValueVec,
+    pub(crate) withdrawal_keys:   WithdrawalCotaNFTKeyV1Vec,
+    pub(crate) withdrawal_values: WithdrawalCotaNFTValueV1Vec,
     pub(crate) proof:             Bytes,
     pub(crate) withdrawal_proof:  Bytes,
     pub(crate) action:            Bytes,
@@ -2278,12 +2278,12 @@ impl TransferUpdateCotaNFTV2EntriesBuilder {
         self
     }
 
-    pub fn withdrawal_keys(mut self, v: WithdrawalCotaNFTKeyVec) -> Self {
+    pub fn withdrawal_keys(mut self, v: WithdrawalCotaNFTKeyV1Vec) -> Self {
         self.withdrawal_keys = v;
         self
     }
 
-    pub fn withdrawal_values(mut self, v: WithdrawalCotaNFTValueVec) -> Self {
+    pub fn withdrawal_values(mut self, v: WithdrawalCotaNFTValueV1Vec) -> Self {
         self.withdrawal_values = v;
         self
     }
