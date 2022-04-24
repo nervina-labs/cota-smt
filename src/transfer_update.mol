@@ -1,4 +1,5 @@
 import common;
+import raw_tx;
 
 table ClaimUpdateCotaNFTEntries {
   hold_keys: HoldCotaNFTKeyVec,
@@ -29,4 +30,32 @@ table TransferUpdateCotaNFTV1Entries {
   proof: Bytes,
   withdrawal_proof: Bytes,
   action: Bytes,
+}
+
+
+// V2
+table ClaimUpdateCotaNFTV2Entries {
+  hold_keys: HoldCotaNFTKeyVec,
+  hold_values: HoldCotaNFTValueVec,
+  claim_keys: ClaimCotaNFTKeyVec,
+  claim_infos: ClaimCotaNFTInfoVec,
+  proof: Bytes,
+  withdrawal_proof: Bytes,
+  action: Bytes,
+  raw_tx: RawTransaction,
+  output_index: Uint32,
+  tx_proof: TransactionProof,
+}
+
+table TransferUpdateCotaNFTV2Entries {
+  claim_keys: ClaimCotaNFTKeyVec,
+  claim_infos: ClaimCotaNFTInfoVec,
+  withdrawal_keys: WithdrawalCotaNFTKeyV1Vec,
+  withdrawal_values: WithdrawalCotaNFTValueV1Vec,
+  proof: Bytes,
+  withdrawal_proof: Bytes,
+  action: Bytes,
+  raw_tx: RawTransaction,
+  output_index: Uint32,
+  tx_proof: TransactionProof,
 }
