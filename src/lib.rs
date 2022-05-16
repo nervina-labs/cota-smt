@@ -6,7 +6,7 @@
 pub mod common;
 pub mod define;
 pub mod mint;
-pub mod raw_tx;
+pub mod blockchain;
 pub mod registry;
 pub mod smt;
 pub mod transfer;
@@ -16,8 +16,10 @@ pub mod update;
 cfg_if::cfg_if! {
     if #[cfg(feature = "std")] {
         pub use ckb_types::{self, molecule};
+        pub use ckb_jsonrpc_types;
     } else  if #[cfg(feature = "no-std")] {
         pub use ckb_std::ckb_types;
+        pub use ckb_jsonrpc_types;
         pub use molecule;
     }
 }

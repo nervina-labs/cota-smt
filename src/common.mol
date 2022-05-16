@@ -1,19 +1,20 @@
-// Uint16/Uint32: big endian
+// The `UIntN` is used to store a `N` bits unsigned integer
+// as a byte array in big endian.
 
-array Byte32 [byte; 32];
-array Uint16 [byte; 2];
-array Uint32 [byte; 4];
-array Uint64 [byte; 8];
-vector Bytes <byte>;
+import blockchain;
+
+array UInt16 [byte; 2];
+array UInt32 [byte; 4];
+array UInt64 [byte; 8];
 
 array CotaId [byte; 20];
 array Characteristic [byte; 20];
 array OutPointSlice [byte; 24];
 
 struct CotaNFTId {
-  smt_type: Uint16,
+  smt_type: UInt16,
   cota_id: CotaId,
-  index: Uint32,
+  index: UInt32,
 }
 
 struct CotaNFTInfo {
@@ -23,13 +24,13 @@ struct CotaNFTInfo {
 }
 
 struct DefineCotaNFTId {
-  smt_type: Uint16,
+  smt_type: UInt16,
   cota_id: CotaId,
 }
 
 struct DefineCotaNFTValue {
-  total: Uint32,
-  issued: Uint32,
+  total: UInt32,
+  issued: UInt32,
   configure: byte,
 }
 vector DefineCotaNFTKeyVec <DefineCotaNFTId>;

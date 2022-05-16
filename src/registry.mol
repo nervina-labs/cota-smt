@@ -1,4 +1,5 @@
 import common;
+import blockchain;
 
 struct Registry {
   lock_hash: Byte32,
