@@ -3,15 +3,15 @@
 #![allow(dead_code)]
 #![allow(clippy::if_same_then_else)]
 
-use super::ckb_types::{prelude::*, packed::*};
 use super::ckb_jsonrpc_types::*;
+use super::ckb_types::{packed::*, prelude::*};
 use super::molecule::{self, prelude::*};
 extern crate alloc;
 pub use alloc::vec::*;
 // these lines above are manually added
 
+use super::blockchain::{TransactionProof, TransactionProofBuilder, TransactionProofReader};
 use super::common::*;
-use super::blockchain::{TransactionProof, TransactionProofReader, TransactionProofBuilder};
 #[derive(Clone)]
 pub struct WithdrawalCotaNFTEntries(molecule::bytes::Bytes);
 impl ::core::fmt::LowerHex for WithdrawalCotaNFTEntries {

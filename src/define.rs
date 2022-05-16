@@ -3,8 +3,7 @@
 #![allow(dead_code)]
 #![allow(clippy::if_same_then_else)]
 
-
-use super::ckb_types::{prelude::*, packed::*};
+use super::ckb_types::{packed::*, prelude::*};
 use super::molecule::{self, prelude::*};
 extern crate alloc;
 pub use alloc::vec::*;
