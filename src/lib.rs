@@ -3,7 +3,6 @@
 #![no_std]
 #![allow(warnings)]
 
-pub mod blockchain;
 pub mod common;
 pub mod define;
 pub mod mint;

@@ -1,5 +1,4 @@
 import common;
-import blockchain;
 
 table WithdrawalCotaNFTEntries {
   hold_keys: HoldCotaNFTKeyVec,
@@ -64,8 +63,8 @@ table ClaimCotaNFTV2Entries {
   leaf_keys: Byte32Vec,
   leaf_values: Byte32Vec,
   withdrawal_proof: Bytes,
-  raw_tx: RawTransaction,
-  output_index: UInt32,
+
+  raw_tx: Bytes,
   tx_proof: TransactionProof,
 }
 
@@ -81,7 +80,7 @@ table TransferCotaNFTV2Entries {
   leaf_keys: Byte32Vec,
   leaf_values: Byte32Vec,
   withdrawal_proof: Bytes,
-  raw_tx: RawTransaction,
-  output_index: UInt32,
+
+  raw_tx: Bytes,
   tx_proof: TransactionProof,
 }

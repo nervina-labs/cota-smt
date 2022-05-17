@@ -3,14 +3,13 @@
 #![allow(dead_code)]
 #![allow(clippy::if_same_then_else)]
 
-use super::ckb_types::{packed::*, prelude::*};
+use super::ckb_types::prelude::*;
 use super::molecule::{self, prelude::*};
 extern crate alloc;
 pub use alloc::vec::*;
 // these lines above are manually added
 
 use super::common::*;
-use molecule::prelude::*;
 #[derive(Clone)]
 pub struct DefineCotaNFTEntries(molecule::bytes::Bytes);
 impl ::core::fmt::LowerHex for DefineCotaNFTEntries {

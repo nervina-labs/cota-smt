@@ -1,5 +1,4 @@
 import common;
-import blockchain;
 
 table UpdateCotaNFTEntries {
   hold_keys: HoldCotaNFTKeyVec,

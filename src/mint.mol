@@ -1,5 +1,4 @@
 import common;
-import blockchain;
 
 table MintCotaNFTEntries {
   define_keys: DefineCotaNFTKeyVec,
