@@ -4,7 +4,7 @@
 #![allow(dead_code)]
 #![allow(clippy::if_same_then_else)]
 
-use super::ckb_types::{prelude::*, packed::{*, Bytes}};
+use super::ckb_types::prelude::*;
 use super::molecule::{self, prelude::*};
 extern crate alloc;
 pub use alloc::vec::*;
