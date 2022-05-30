@@ -47,6 +47,7 @@ table ClaimUpdateCotaNFTV2Entries {
   withdrawal_proof: Bytes,
 
   raw_tx: Bytes,
+  output_index: Uint32,
   tx_proof: TransactionProof,
 }
 
@@ -64,5 +65,6 @@ table TransferUpdateCotaNFTV2Entries {
   withdrawal_proof: Bytes,
 
   raw_tx: Bytes,
+  output_index: Uint32,
   tx_proof: TransactionProof,
 }

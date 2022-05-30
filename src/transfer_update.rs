@@ -1357,6 +1357,7 @@ impl ::core::fmt::Display for ClaimUpdateCotaNFTV2Entries {
         write!(f, ", {}: {}", "leaf_values", self.leaf_values())?;
         write!(f, ", {}: {}", "withdrawal_proof", self.withdrawal_proof())?;
         write!(f, ", {}: {}", "raw_tx", self.raw_tx())?;
+        write!(f, ", {}: {}", "output_index", self.output_index())?;
         write!(f, ", {}: {}", "tx_proof", self.tx_proof())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -1368,18 +1369,18 @@ impl ::core::fmt::Display for ClaimUpdateCotaNFTV2Entries {
 impl ::core::default::Default for ClaimUpdateCotaNFTV2Entries {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            152, 0, 0, 0, 48, 0, 0, 0, 52, 0, 0, 0, 56, 0, 0, 0, 60, 0, 0, 0, 64, 0, 0, 0, 68, 0,
-            0, 0, 72, 0, 0, 0, 76, 0, 0, 0, 80, 0, 0, 0, 84, 0, 0, 0, 88, 0, 0, 0, 0, 0, 0, 0, 0,
+            160, 0, 0, 0, 52, 0, 0, 0, 56, 0, 0, 0, 60, 0, 0, 0, 64, 0, 0, 0, 68, 0, 0, 0, 72, 0,
+            0, 0, 76, 0, 0, 0, 80, 0, 0, 0, 84, 0, 0, 0, 88, 0, 0, 0, 92, 0, 0, 0, 96, 0, 0, 0, 0,
             0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 12, 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 12, 0,
-            0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 12, 0, 0, 0, 44, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 20, 0, 0, 0, 12, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
         ClaimUpdateCotaNFTV2Entries::new_unchecked(v.into())
     }
 }
 impl ClaimUpdateCotaNFTV2Entries {
-    pub const FIELD_COUNT: usize = 11;
+    pub const FIELD_COUNT: usize = 12;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -1471,11 +1472,18 @@ impl ClaimUpdateCotaNFTV2Entries {
         Bytes::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn tx_proof(&self) -> TransactionProof {
+    pub fn output_index(&self) -> Uint32 {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[44..]) as usize;
+        let end = molecule::unpack_number(&slice[48..]) as usize;
+        Uint32::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn tx_proof(&self) -> TransactionProof {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[48..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[48..]) as usize;
+            let end = molecule::unpack_number(&slice[52..]) as usize;
             TransactionProof::new_unchecked(self.0.slice(start..end))
         } else {
             TransactionProof::new_unchecked(self.0.slice(start..))
@@ -1528,6 +1536,7 @@ impl molecule::prelude::Entity for ClaimUpdateCotaNFTV2Entries {
             .leaf_values(self.leaf_values())
             .withdrawal_proof(self.withdrawal_proof())
             .raw_tx(self.raw_tx())
+            .output_index(self.output_index())
             .tx_proof(self.tx_proof())
     }
 }
@@ -1560,6 +1569,7 @@ impl<'r> ::core::fmt::Display for ClaimUpdateCotaNFTV2EntriesReader<'r> {
         write!(f, ", {}: {}", "leaf_values", self.leaf_values())?;
         write!(f, ", {}: {}", "withdrawal_proof", self.withdrawal_proof())?;
         write!(f, ", {}: {}", "raw_tx", self.raw_tx())?;
+        write!(f, ", {}: {}", "output_index", self.output_index())?;
         write!(f, ", {}: {}", "tx_proof", self.tx_proof())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -1569,7 +1579,7 @@ impl<'r> ::core::fmt::Display for ClaimUpdateCotaNFTV2EntriesReader<'r> {
     }
 }
 impl<'r> ClaimUpdateCotaNFTV2EntriesReader<'r> {
-    pub const FIELD_COUNT: usize = 11;
+    pub const FIELD_COUNT: usize = 12;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -1661,11 +1671,18 @@ impl<'r> ClaimUpdateCotaNFTV2EntriesReader<'r> {
         BytesReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn tx_proof(&self) -> TransactionProofReader<'r> {
+    pub fn output_index(&self) -> Uint32Reader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[44..]) as usize;
+        let end = molecule::unpack_number(&slice[48..]) as usize;
+        Uint32Reader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn tx_proof(&self) -> TransactionProofReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[48..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[48..]) as usize;
+            let end = molecule::unpack_number(&slice[52..]) as usize;
             TransactionProofReader::new_unchecked(&self.as_slice()[start..end])
         } else {
             TransactionProofReader::new_unchecked(&self.as_slice()[start..])
@@ -1736,7 +1753,8 @@ impl<'r> molecule::prelude::Reader<'r> for ClaimUpdateCotaNFTV2EntriesReader<'r>
         Byte32VecReader::verify(&slice[offsets[7]..offsets[8]], compatible)?;
         BytesReader::verify(&slice[offsets[8]..offsets[9]], compatible)?;
         BytesReader::verify(&slice[offsets[9]..offsets[10]], compatible)?;
-        TransactionProofReader::verify(&slice[offsets[10]..offsets[11]], compatible)?;
+        Uint32Reader::verify(&slice[offsets[10]..offsets[11]], compatible)?;
+        TransactionProofReader::verify(&slice[offsets[11]..offsets[12]], compatible)?;
         Ok(())
     }
 }
@@ -1752,10 +1770,11 @@ pub struct ClaimUpdateCotaNFTV2EntriesBuilder {
     pub(crate) leaf_values:      Byte32Vec,
     pub(crate) withdrawal_proof: Bytes,
     pub(crate) raw_tx:           Bytes,
+    pub(crate) output_index:     Uint32,
     pub(crate) tx_proof:         TransactionProof,
 }
 impl ClaimUpdateCotaNFTV2EntriesBuilder {
-    pub const FIELD_COUNT: usize = 11;
+    pub const FIELD_COUNT: usize = 12;
 
     pub fn hold_keys(mut self, v: HoldCotaNFTKeyVec) -> Self {
         self.hold_keys = v;
@@ -1807,6 +1826,11 @@ impl ClaimUpdateCotaNFTV2EntriesBuilder {
         self
     }
 
+    pub fn output_index(mut self, v: Uint32) -> Self {
+        self.output_index = v;
+        self
+    }
+
     pub fn tx_proof(mut self, v: TransactionProof) -> Self {
         self.tx_proof = v;
         self
@@ -1829,6 +1853,7 @@ impl molecule::prelude::Builder for ClaimUpdateCotaNFTV2EntriesBuilder {
             + self.leaf_values.as_slice().len()
             + self.withdrawal_proof.as_slice().len()
             + self.raw_tx.as_slice().len()
+            + self.output_index.as_slice().len()
             + self.tx_proof.as_slice().len()
     }
 
@@ -1856,6 +1881,8 @@ impl molecule::prelude::Builder for ClaimUpdateCotaNFTV2EntriesBuilder {
         offsets.push(total_size);
         total_size += self.raw_tx.as_slice().len();
         offsets.push(total_size);
+        total_size += self.output_index.as_slice().len();
+        offsets.push(total_size);
         total_size += self.tx_proof.as_slice().len();
         writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
         for offset in offsets.into_iter() {
@@ -1871,6 +1898,7 @@ impl molecule::prelude::Builder for ClaimUpdateCotaNFTV2EntriesBuilder {
         writer.write_all(self.leaf_values.as_slice())?;
         writer.write_all(self.withdrawal_proof.as_slice())?;
         writer.write_all(self.raw_tx.as_slice())?;
+        writer.write_all(self.output_index.as_slice())?;
         writer.write_all(self.tx_proof.as_slice())?;
         Ok(())
     }
@@ -1911,6 +1939,7 @@ impl ::core::fmt::Display for TransferUpdateCotaNFTV2Entries {
         write!(f, ", {}: {}", "leaf_values", self.leaf_values())?;
         write!(f, ", {}: {}", "withdrawal_proof", self.withdrawal_proof())?;
         write!(f, ", {}: {}", "raw_tx", self.raw_tx())?;
+        write!(f, ", {}: {}", "output_index", self.output_index())?;
         write!(f, ", {}: {}", "tx_proof", self.tx_proof())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -1922,18 +1951,18 @@ impl ::core::fmt::Display for TransferUpdateCotaNFTV2Entries {
 impl ::core::default::Default for TransferUpdateCotaNFTV2Entries {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            152, 0, 0, 0, 48, 0, 0, 0, 52, 0, 0, 0, 56, 0, 0, 0, 60, 0, 0, 0, 64, 0, 0, 0, 68, 0,
-            0, 0, 72, 0, 0, 0, 76, 0, 0, 0, 80, 0, 0, 0, 84, 0, 0, 0, 88, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 12, 0, 0, 0, 44, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 20, 0, 0, 0, 12, 0,
-            0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            160, 0, 0, 0, 52, 0, 0, 0, 56, 0, 0, 0, 60, 0, 0, 0, 64, 0, 0, 0, 68, 0, 0, 0, 72, 0,
+            0, 0, 76, 0, 0, 0, 80, 0, 0, 0, 84, 0, 0, 0, 88, 0, 0, 0, 92, 0, 0, 0, 96, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 64, 0, 0, 0, 12, 0, 0, 0, 44, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 20, 0, 0, 0, 12, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
         TransferUpdateCotaNFTV2Entries::new_unchecked(v.into())
     }
 }
 impl TransferUpdateCotaNFTV2Entries {
-    pub const FIELD_COUNT: usize = 11;
+    pub const FIELD_COUNT: usize = 12;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -2025,11 +2054,18 @@ impl TransferUpdateCotaNFTV2Entries {
         Bytes::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn tx_proof(&self) -> TransactionProof {
+    pub fn output_index(&self) -> Uint32 {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[44..]) as usize;
+        let end = molecule::unpack_number(&slice[48..]) as usize;
+        Uint32::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn tx_proof(&self) -> TransactionProof {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[48..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[48..]) as usize;
+            let end = molecule::unpack_number(&slice[52..]) as usize;
             TransactionProof::new_unchecked(self.0.slice(start..end))
         } else {
             TransactionProof::new_unchecked(self.0.slice(start..))
@@ -2082,6 +2118,7 @@ impl molecule::prelude::Entity for TransferUpdateCotaNFTV2Entries {
             .leaf_values(self.leaf_values())
             .withdrawal_proof(self.withdrawal_proof())
             .raw_tx(self.raw_tx())
+            .output_index(self.output_index())
             .tx_proof(self.tx_proof())
     }
 }
@@ -2114,6 +2151,7 @@ impl<'r> ::core::fmt::Display for TransferUpdateCotaNFTV2EntriesReader<'r> {
         write!(f, ", {}: {}", "leaf_values", self.leaf_values())?;
         write!(f, ", {}: {}", "withdrawal_proof", self.withdrawal_proof())?;
         write!(f, ", {}: {}", "raw_tx", self.raw_tx())?;
+        write!(f, ", {}: {}", "output_index", self.output_index())?;
         write!(f, ", {}: {}", "tx_proof", self.tx_proof())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -2123,7 +2161,7 @@ impl<'r> ::core::fmt::Display for TransferUpdateCotaNFTV2EntriesReader<'r> {
     }
 }
 impl<'r> TransferUpdateCotaNFTV2EntriesReader<'r> {
-    pub const FIELD_COUNT: usize = 11;
+    pub const FIELD_COUNT: usize = 12;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -2215,11 +2253,18 @@ impl<'r> TransferUpdateCotaNFTV2EntriesReader<'r> {
         BytesReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn tx_proof(&self) -> TransactionProofReader<'r> {
+    pub fn output_index(&self) -> Uint32Reader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[44..]) as usize;
+        let end = molecule::unpack_number(&slice[48..]) as usize;
+        Uint32Reader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn tx_proof(&self) -> TransactionProofReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[48..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[48..]) as usize;
+            let end = molecule::unpack_number(&slice[52..]) as usize;
             TransactionProofReader::new_unchecked(&self.as_slice()[start..end])
         } else {
             TransactionProofReader::new_unchecked(&self.as_slice()[start..])
@@ -2290,7 +2335,8 @@ impl<'r> molecule::prelude::Reader<'r> for TransferUpdateCotaNFTV2EntriesReader<
         Byte32VecReader::verify(&slice[offsets[7]..offsets[8]], compatible)?;
         BytesReader::verify(&slice[offsets[8]..offsets[9]], compatible)?;
         BytesReader::verify(&slice[offsets[9]..offsets[10]], compatible)?;
-        TransactionProofReader::verify(&slice[offsets[10]..offsets[11]], compatible)?;
+        Uint32Reader::verify(&slice[offsets[10]..offsets[11]], compatible)?;
+        TransactionProofReader::verify(&slice[offsets[11]..offsets[12]], compatible)?;
         Ok(())
     }
 }
@@ -2306,10 +2352,11 @@ pub struct TransferUpdateCotaNFTV2EntriesBuilder {
     pub(crate) leaf_values:       Byte32Vec,
     pub(crate) withdrawal_proof:  Bytes,
     pub(crate) raw_tx:            Bytes,
+    pub(crate) output_index:      Uint32,
     pub(crate) tx_proof:          TransactionProof,
 }
 impl TransferUpdateCotaNFTV2EntriesBuilder {
-    pub const FIELD_COUNT: usize = 11;
+    pub const FIELD_COUNT: usize = 12;
 
     pub fn claim_keys(mut self, v: ClaimCotaNFTKeyVec) -> Self {
         self.claim_keys = v;
@@ -2361,6 +2408,11 @@ impl TransferUpdateCotaNFTV2EntriesBuilder {
         self
     }
 
+    pub fn output_index(mut self, v: Uint32) -> Self {
+        self.output_index = v;
+        self
+    }
+
     pub fn tx_proof(mut self, v: TransactionProof) -> Self {
         self.tx_proof = v;
         self
@@ -2383,6 +2435,7 @@ impl molecule::prelude::Builder for TransferUpdateCotaNFTV2EntriesBuilder {
             + self.leaf_values.as_slice().len()
             + self.withdrawal_proof.as_slice().len()
             + self.raw_tx.as_slice().len()
+            + self.output_index.as_slice().len()
             + self.tx_proof.as_slice().len()
     }
 
@@ -2410,6 +2463,8 @@ impl molecule::prelude::Builder for TransferUpdateCotaNFTV2EntriesBuilder {
         offsets.push(total_size);
         total_size += self.raw_tx.as_slice().len();
         offsets.push(total_size);
+        total_size += self.output_index.as_slice().len();
+        offsets.push(total_size);
         total_size += self.tx_proof.as_slice().len();
         writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
         for offset in offsets.into_iter() {
@@ -2425,6 +2480,7 @@ impl molecule::prelude::Builder for TransferUpdateCotaNFTV2EntriesBuilder {
         writer.write_all(self.leaf_values.as_slice())?;
         writer.write_all(self.withdrawal_proof.as_slice())?;
         writer.write_all(self.raw_tx.as_slice())?;
+        writer.write_all(self.output_index.as_slice())?;
         writer.write_all(self.tx_proof.as_slice())?;
         Ok(())
     }
