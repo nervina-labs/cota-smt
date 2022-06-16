@@ -1,5 +1,4 @@
 import common;
-import raw_tx;
 
 table ClaimUpdateCotaNFTEntries {
   hold_keys: HoldCotaNFTKeyVec,
@@ -40,9 +39,14 @@ table ClaimUpdateCotaNFTV2Entries {
   claim_keys: ClaimCotaNFTKeyVec,
   claim_infos: ClaimCotaNFTInfoVec,
   proof: Bytes,
-  withdrawal_proof: Bytes,
   action: Bytes,
-  raw_tx: RawTransaction,
+
+  // The leaf_keys and leaf_values are used to verify withdraw smt proof
+  leaf_keys: Byte32Vec,
+  leaf_values: Byte32Vec,
+  withdrawal_proof: Bytes,
+
+  raw_tx: Bytes,
   output_index: Uint32,
   tx_proof: TransactionProof,
 }
@@ -53,9 +57,14 @@ table TransferUpdateCotaNFTV2Entries {
   withdrawal_keys: WithdrawalCotaNFTKeyV1Vec,
   withdrawal_values: WithdrawalCotaNFTValueV1Vec,
   proof: Bytes,
-  withdrawal_proof: Bytes,
   action: Bytes,
-  raw_tx: RawTransaction,
+
+  // The leaf_keys and leaf_values are used to verify withdraw smt proof
+  leaf_keys: Byte32Vec,
+  leaf_values: Byte32Vec,
+  withdrawal_proof: Bytes,
+
+  raw_tx: Bytes,
   output_index: Uint32,
   tx_proof: TransactionProof,
 }

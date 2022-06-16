@@ -6,7 +6,6 @@
 pub mod common;
 pub mod define;
 pub mod mint;
-pub mod raw_tx;
 pub mod registry;
 pub mod smt;
 pub mod transfer;
