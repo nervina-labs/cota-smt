@@ -1,14 +1,18 @@
-// Uint16/Uint32: big endian
+// The `UintN` is used to store a `N` bits unsigned integer
+// as a byte array in big endian.
 
-array Byte32 [byte; 32];
 array Uint16 [byte; 2];
 array Uint32 [byte; 4];
 array Uint64 [byte; 8];
-vector Bytes <byte>;
+array Byte32 [byte; 32];
 
 array CotaId [byte; 20];
 array Characteristic [byte; 20];
 array OutPointSlice [byte; 24];
+
+vector Bytes <byte>;
+vector Uint32Vec <Uint32>;
+vector Byte32Vec <Byte32>;
 
 struct CotaNFTId {
   smt_type: Uint16,
@@ -20,6 +24,16 @@ struct CotaNFTInfo {
   configure: byte,
   state: byte,
   characteristic: Characteristic,
+}
+
+table MerkleProof {
+  indices: Uint32Vec,
+  lemmas: Byte32Vec,
+}
+
+table TransactionProof {
+  witnesses_root: Byte32,
+  proof: MerkleProof,
 }
 
 struct DefineCotaNFTId {

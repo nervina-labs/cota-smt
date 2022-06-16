@@ -11,7 +11,6 @@ pub use alloc::vec::*;
 // these lines above are manually added
 
 use super::common::*;
-use molecule::prelude::*;
 #[derive(Clone)]
 pub struct MintCotaNFTEntries(molecule::bytes::Bytes);
 impl ::core::fmt::LowerHex for MintCotaNFTEntries {
