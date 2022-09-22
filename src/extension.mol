@@ -1,0 +1,64 @@
+import common;
+
+array Byte6 [byte; 6];
+array Byte9 [byte; 9];
+array Byte20 [byte; 20];
+array Byte24 [byte; 24];
+
+vector LockScriptVec <Bytes>;
+vector ExtensionVec <Byte32>;
+
+table ExtensionLeaves {
+  keys: ExtensionVec,
+  values: ExtensionVec,
+  proof: Bytes,
+}
+
+// SubKeys
+struct SubKey {
+  smt_type: Uint16,
+  sub_type: Byte6,
+  ext_data: Uint32,
+  reserved: Byte20,
+}
+struct SubValue {
+  key_type: Uint16,
+  pubkey_hash: Byte20,
+  reserved: Byte9,
+  padding: byte,
+}
+vector SubKeyVec <SubKey>;
+vector SubValueVec <SubValue>;
+table SubKeyEntry {
+  keys: SubKeyVec,
+  values: SubValueVec,
+}
+option SubKeyEntryOpt (SubKeyEntry);
+
+
+// Social Recovery
+struct SocialKey {
+  smt_type: Uint16,
+  sub_type: Byte6,
+  reserved: Byte24,
+}
+table SocialValue {
+  recovery_mode: byte,
+  must: byte,
+  total: byte,
+  signers: LockScriptVec,
+}
+vector SocialKeyVec <SocialKey>;
+vector SocialValueVec <SocialValue>;
+table SocialEntry {
+  keys: SocialKeyVec,
+  values: SocialValueVec,
+}
+option SocialEntryOpt (SocialEntry);
+
+
+table ExtensionEntries {
+  leaves: ExtensionLeaves,
+  subkey: SubKeyEntryOpt,
+  social: SocialEntryOpt,
+}
