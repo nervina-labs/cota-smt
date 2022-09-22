@@ -11,6 +11,7 @@ vector ExtensionVec <Byte32>;
 table ExtensionLeaves {
   keys: ExtensionVec,
   values: ExtensionVec,
+  old_values: ExtensionVec,
   proof: Bytes,
 }
 

@@ -2364,6 +2364,7 @@ impl ::core::fmt::Display for ExtensionLeaves {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "keys", self.keys())?;
         write!(f, ", {}: {}", "values", self.values())?;
+        write!(f, ", {}: {}", "old_values", self.old_values())?;
         write!(f, ", {}: {}", "proof", self.proof())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -2375,13 +2376,14 @@ impl ::core::fmt::Display for ExtensionLeaves {
 impl ::core::default::Default for ExtensionLeaves {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            28, 0, 0, 0, 16, 0, 0, 0, 20, 0, 0, 0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            36, 0, 0, 0, 20, 0, 0, 0, 24, 0, 0, 0, 28, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
         ExtensionLeaves::new_unchecked(v.into())
     }
 }
 impl ExtensionLeaves {
-    pub const FIELD_COUNT: usize = 3;
+    pub const FIELD_COUNT: usize = 4;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -2417,11 +2419,18 @@ impl ExtensionLeaves {
         ExtensionVec::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn proof(&self) -> Bytes {
+    pub fn old_values(&self) -> ExtensionVec {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
+        let end = molecule::unpack_number(&slice[16..]) as usize;
+        ExtensionVec::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn proof(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[16..]) as usize;
+            let end = molecule::unpack_number(&slice[20..]) as usize;
             Bytes::new_unchecked(self.0.slice(start..end))
         } else {
             Bytes::new_unchecked(self.0.slice(start..))
@@ -2465,6 +2474,7 @@ impl molecule::prelude::Entity for ExtensionLeaves {
         Self::new_builder()
             .keys(self.keys())
             .values(self.values())
+            .old_values(self.old_values())
             .proof(self.proof())
     }
 }
@@ -2489,6 +2499,7 @@ impl<'r> ::core::fmt::Display for ExtensionLeavesReader<'r> {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "keys", self.keys())?;
         write!(f, ", {}: {}", "values", self.values())?;
+        write!(f, ", {}: {}", "old_values", self.old_values())?;
         write!(f, ", {}: {}", "proof", self.proof())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -2498,7 +2509,7 @@ impl<'r> ::core::fmt::Display for ExtensionLeavesReader<'r> {
     }
 }
 impl<'r> ExtensionLeavesReader<'r> {
-    pub const FIELD_COUNT: usize = 3;
+    pub const FIELD_COUNT: usize = 4;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -2534,11 +2545,18 @@ impl<'r> ExtensionLeavesReader<'r> {
         ExtensionVecReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn proof(&self) -> BytesReader<'r> {
+    pub fn old_values(&self) -> ExtensionVecReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
+        let end = molecule::unpack_number(&slice[16..]) as usize;
+        ExtensionVecReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn proof(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[16..]) as usize;
+            let end = molecule::unpack_number(&slice[20..]) as usize;
             BytesReader::new_unchecked(&self.as_slice()[start..end])
         } else {
             BytesReader::new_unchecked(&self.as_slice()[start..])
@@ -2601,18 +2619,20 @@ impl<'r> molecule::prelude::Reader<'r> for ExtensionLeavesReader<'r> {
         }
         ExtensionVecReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
         ExtensionVecReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
-        BytesReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
+        ExtensionVecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
+        BytesReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
         Ok(())
     }
 }
 #[derive(Debug, Default)]
 pub struct ExtensionLeavesBuilder {
-    pub(crate) keys:   ExtensionVec,
-    pub(crate) values: ExtensionVec,
-    pub(crate) proof:  Bytes,
+    pub(crate) keys:       ExtensionVec,
+    pub(crate) values:     ExtensionVec,
+    pub(crate) old_values: ExtensionVec,
+    pub(crate) proof:      Bytes,
 }
 impl ExtensionLeavesBuilder {
-    pub const FIELD_COUNT: usize = 3;
+    pub const FIELD_COUNT: usize = 4;
 
     pub fn keys(mut self, v: ExtensionVec) -> Self {
         self.keys = v;
@@ -2621,6 +2641,11 @@ impl ExtensionLeavesBuilder {
 
     pub fn values(mut self, v: ExtensionVec) -> Self {
         self.values = v;
+        self
+    }
+
+    pub fn old_values(mut self, v: ExtensionVec) -> Self {
+        self.old_values = v;
         self
     }
 
@@ -2638,6 +2663,7 @@ impl molecule::prelude::Builder for ExtensionLeavesBuilder {
         molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
             + self.keys.as_slice().len()
             + self.values.as_slice().len()
+            + self.old_values.as_slice().len()
             + self.proof.as_slice().len()
     }
 
@@ -2649,6 +2675,8 @@ impl molecule::prelude::Builder for ExtensionLeavesBuilder {
         offsets.push(total_size);
         total_size += self.values.as_slice().len();
         offsets.push(total_size);
+        total_size += self.old_values.as_slice().len();
+        offsets.push(total_size);
         total_size += self.proof.as_slice().len();
         writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
         for offset in offsets.into_iter() {
@@ -2656,6 +2684,7 @@ impl molecule::prelude::Builder for ExtensionLeavesBuilder {
         }
         writer.write_all(self.keys.as_slice())?;
         writer.write_all(self.values.as_slice())?;
+        writer.write_all(self.old_values.as_slice())?;
         writer.write_all(self.proof.as_slice())?;
         Ok(())
     }
@@ -5966,8 +5995,8 @@ impl ::core::fmt::Display for ExtensionEntries {
 impl ::core::default::Default for ExtensionEntries {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            44, 0, 0, 0, 16, 0, 0, 0, 44, 0, 0, 0, 44, 0, 0, 0, 28, 0, 0, 0, 16, 0, 0, 0, 20, 0, 0,
-            0, 24, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            52, 0, 0, 0, 16, 0, 0, 0, 52, 0, 0, 0, 52, 0, 0, 0, 36, 0, 0, 0, 20, 0, 0, 0, 24, 0, 0,
+            0, 28, 0, 0, 0, 32, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
         ExtensionEntries::new_unchecked(v.into())
     }
