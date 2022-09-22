@@ -225,7 +225,7 @@ dependencies = [
 
 [[package]]
 name = "cota-smt"
-version = "0.5.0"
+version = "0.6.0"
 dependencies = [
  "blake2b-ref 0.3.0",
  "cfg-if 1.0.0",
