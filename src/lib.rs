@@ -6,13 +6,13 @@
 pub mod common;
 pub mod define;
 pub mod extension;
+pub mod joyid;
 pub mod mint;
 pub mod registry;
 pub mod smt;
 pub mod transfer;
 pub mod transfer_update;
 pub mod update;
-pub mod joyid;
 
 cfg_if::cfg_if! {
     if #[cfg(feature = "std")] {
