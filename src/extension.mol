@@ -1,7 +1,5 @@
 import common;
 
-array Byte6 [byte; 6];
-
 vector LockScriptVec <Bytes>;
 vector ExtensionVec <Byte32>;
 
