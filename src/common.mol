@@ -9,7 +9,6 @@ array Byte9 [byte; 9];
 array Byte20 [byte; 20];
 array Byte24 [byte; 24];
 array Byte32 [byte; 32];
-array Byte64 [byte; 64];
 
 array CotaId [byte; 20];
 array Characteristic [byte; 20];

@@ -46,11 +46,20 @@ table SocialEntries {
   values: SocialValueVec,
 }
 
-vector PubkeyVec <Byte64>;
-vector SignatureVec <Byte64>;
+
+table FriendPubkey {
+  unlock_mode: byte,         
+  alg_index: Uint16,    
+  pubkey: Bytes,      
+	signature: Bytes,   
+
+  // only for subkey
+  ext_data: Uint32,   
+  subkey_proof: Bytes,
+}
+vector FriendPubkeyVec <FriendPubkey>;
 table SocialUnlockEntries {
   social_value: SocialValue, 
-  social_proof: Bytes, 
-  pubkeys: PubkeyVec,
-  signatures: SignatureVec,
+  social_proof: Bytes,     
+  social_friends: FriendPubkeyVec,
 }

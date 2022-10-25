@@ -3798,8 +3798,8 @@ impl molecule::prelude::Builder for SocialEntriesBuilder {
     }
 }
 #[derive(Clone)]
-pub struct PubkeyVec(molecule::bytes::Bytes);
-impl ::core::fmt::LowerHex for PubkeyVec {
+pub struct FriendPubkey(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for FriendPubkey {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
         if f.alternate() {
@@ -3808,74 +3808,116 @@ impl ::core::fmt::LowerHex for PubkeyVec {
         write!(f, "{}", hex_string(self.as_slice()))
     }
 }
-impl ::core::fmt::Debug for PubkeyVec {
+impl ::core::fmt::Debug for FriendPubkey {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:#x})", Self::NAME, self)
     }
 }
-impl ::core::fmt::Display for PubkeyVec {
+impl ::core::fmt::Display for FriendPubkey {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-        write!(f, "{} [", Self::NAME)?;
-        for i in 0..self.len() {
-            if i == 0 {
-                write!(f, "{}", self.get_unchecked(i))?;
-            } else {
-                write!(f, ", {}", self.get_unchecked(i))?;
-            }
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "unlock_mode", self.unlock_mode())?;
+        write!(f, ", {}: {}", "alg_index", self.alg_index())?;
+        write!(f, ", {}: {}", "pubkey", self.pubkey())?;
+        write!(f, ", {}: {}", "signature", self.signature())?;
+        write!(f, ", {}: {}", "ext_data", self.ext_data())?;
+        write!(f, ", {}: {}", "subkey_proof", self.subkey_proof())?;
+        let extra_count = self.count_extra_fields();
+        if extra_count != 0 {
+            write!(f, ", .. ({} fields)", extra_count)?;
         }
-        write!(f, "]")
+        write!(f, " }}")
     }
 }
-impl ::core::default::Default for PubkeyVec {
+impl ::core::default::Default for FriendPubkey {
     fn default() -> Self {
-        let v: Vec<u8> = vec![0, 0, 0, 0];
-        PubkeyVec::new_unchecked(v.into())
+        let v: Vec<u8> = vec![
+            47, 0, 0, 0, 28, 0, 0, 0, 29, 0, 0, 0, 31, 0, 0, 0, 35, 0, 0, 0, 39, 0, 0, 0, 43, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+        ];
+        FriendPubkey::new_unchecked(v.into())
     }
 }
-impl PubkeyVec {
-    pub const ITEM_SIZE: usize = 64;
+impl FriendPubkey {
+    pub const FIELD_COUNT: usize = 6;
 
     pub fn total_size(&self) -> usize {
-        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
-    }
-
-    pub fn item_count(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
     }
 
-    pub fn len(&self) -> usize {
-        self.item_count()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    pub fn get(&self, idx: usize) -> Option<Byte64> {
-        if idx >= self.len() {
-            None
+    pub fn field_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
         } else {
-            Some(self.get_unchecked(idx))
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
         }
     }
 
-    pub fn get_unchecked(&self, idx: usize) -> Byte64 {
-        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
-        let end = start + Self::ITEM_SIZE;
-        Byte64::new_unchecked(self.0.slice(start..end))
+    pub fn count_extra_fields(&self) -> usize {
+        self.field_count() - Self::FIELD_COUNT
     }
 
-    pub fn as_reader<'r>(&'r self) -> PubkeyVecReader<'r> {
-        PubkeyVecReader::new_unchecked(self.as_slice())
+    pub fn has_extra_fields(&self) -> bool {
+        Self::FIELD_COUNT != self.field_count()
+    }
+
+    pub fn unlock_mode(&self) -> Byte {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[4..]) as usize;
+        let end = molecule::unpack_number(&slice[8..]) as usize;
+        Byte::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn alg_index(&self) -> Uint16 {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[8..]) as usize;
+        let end = molecule::unpack_number(&slice[12..]) as usize;
+        Uint16::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn pubkey(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[12..]) as usize;
+        let end = molecule::unpack_number(&slice[16..]) as usize;
+        Bytes::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn signature(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
+        let end = molecule::unpack_number(&slice[20..]) as usize;
+        Bytes::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn ext_data(&self) -> Uint32 {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[20..]) as usize;
+        let end = molecule::unpack_number(&slice[24..]) as usize;
+        Uint32::new_unchecked(self.0.slice(start..end))
+    }
+
+    pub fn subkey_proof(&self) -> Bytes {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[24..]) as usize;
+        if self.has_extra_fields() {
+            let end = molecule::unpack_number(&slice[28..]) as usize;
+            Bytes::new_unchecked(self.0.slice(start..end))
+        } else {
+            Bytes::new_unchecked(self.0.slice(start..))
+        }
+    }
+
+    pub fn as_reader<'r>(&'r self) -> FriendPubkeyReader<'r> {
+        FriendPubkeyReader::new_unchecked(self.as_slice())
     }
 }
-impl molecule::prelude::Entity for PubkeyVec {
-    type Builder = PubkeyVecBuilder;
+impl molecule::prelude::Entity for FriendPubkey {
+    type Builder = FriendPubkeyBuilder;
 
-    const NAME: &'static str = "PubkeyVec";
+    const NAME: &'static str = "FriendPubkey";
 
     fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
-        PubkeyVec(data)
+        FriendPubkey(data)
     }
 
     fn as_bytes(&self) -> molecule::bytes::Bytes {
@@ -3887,11 +3929,11 @@ impl molecule::prelude::Entity for PubkeyVec {
     }
 
     fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
-        PubkeyVecReader::from_slice(slice).map(|reader| reader.to_entity())
+        FriendPubkeyReader::from_slice(slice).map(|reader| reader.to_entity())
     }
 
     fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
-        PubkeyVecReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+        FriendPubkeyReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
     }
 
     fn new_builder() -> Self::Builder {
@@ -3899,12 +3941,18 @@ impl molecule::prelude::Entity for PubkeyVec {
     }
 
     fn as_builder(self) -> Self::Builder {
-        Self::new_builder().extend(self.into_iter())
+        Self::new_builder()
+            .unlock_mode(self.unlock_mode())
+            .alg_index(self.alg_index())
+            .pubkey(self.pubkey())
+            .signature(self.signature())
+            .ext_data(self.ext_data())
+            .subkey_proof(self.subkey_proof())
     }
 }
 #[derive(Clone, Copy)]
-pub struct PubkeyVecReader<'r>(&'r [u8]);
-impl<'r> ::core::fmt::LowerHex for PubkeyVecReader<'r> {
+pub struct FriendPubkeyReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for FriendPubkeyReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
         if f.alternate() {
@@ -3913,136 +3961,241 @@ impl<'r> ::core::fmt::LowerHex for PubkeyVecReader<'r> {
         write!(f, "{}", hex_string(self.as_slice()))
     }
 }
-impl<'r> ::core::fmt::Debug for PubkeyVecReader<'r> {
+impl<'r> ::core::fmt::Debug for FriendPubkeyReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:#x})", Self::NAME, self)
     }
 }
-impl<'r> ::core::fmt::Display for PubkeyVecReader<'r> {
+impl<'r> ::core::fmt::Display for FriendPubkeyReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-        write!(f, "{} [", Self::NAME)?;
-        for i in 0..self.len() {
-            if i == 0 {
-                write!(f, "{}", self.get_unchecked(i))?;
-            } else {
-                write!(f, ", {}", self.get_unchecked(i))?;
-            }
+        write!(f, "{} {{ ", Self::NAME)?;
+        write!(f, "{}: {}", "unlock_mode", self.unlock_mode())?;
+        write!(f, ", {}: {}", "alg_index", self.alg_index())?;
+        write!(f, ", {}: {}", "pubkey", self.pubkey())?;
+        write!(f, ", {}: {}", "signature", self.signature())?;
+        write!(f, ", {}: {}", "ext_data", self.ext_data())?;
+        write!(f, ", {}: {}", "subkey_proof", self.subkey_proof())?;
+        let extra_count = self.count_extra_fields();
+        if extra_count != 0 {
+            write!(f, ", .. ({} fields)", extra_count)?;
         }
-        write!(f, "]")
+        write!(f, " }}")
     }
 }
-impl<'r> PubkeyVecReader<'r> {
-    pub const ITEM_SIZE: usize = 64;
+impl<'r> FriendPubkeyReader<'r> {
+    pub const FIELD_COUNT: usize = 6;
 
     pub fn total_size(&self) -> usize {
-        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
-    }
-
-    pub fn item_count(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
     }
 
-    pub fn len(&self) -> usize {
-        self.item_count()
-    }
-
-    pub fn is_empty(&self) -> bool {
-        self.len() == 0
-    }
-
-    pub fn get(&self, idx: usize) -> Option<Byte64Reader<'r>> {
-        if idx >= self.len() {
-            None
+    pub fn field_count(&self) -> usize {
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
         } else {
-            Some(self.get_unchecked(idx))
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
         }
     }
 
-    pub fn get_unchecked(&self, idx: usize) -> Byte64Reader<'r> {
-        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
-        let end = start + Self::ITEM_SIZE;
-        Byte64Reader::new_unchecked(&self.as_slice()[start..end])
+    pub fn count_extra_fields(&self) -> usize {
+        self.field_count() - Self::FIELD_COUNT
+    }
+
+    pub fn has_extra_fields(&self) -> bool {
+        Self::FIELD_COUNT != self.field_count()
+    }
+
+    pub fn unlock_mode(&self) -> ByteReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[4..]) as usize;
+        let end = molecule::unpack_number(&slice[8..]) as usize;
+        ByteReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn alg_index(&self) -> Uint16Reader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[8..]) as usize;
+        let end = molecule::unpack_number(&slice[12..]) as usize;
+        Uint16Reader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn pubkey(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[12..]) as usize;
+        let end = molecule::unpack_number(&slice[16..]) as usize;
+        BytesReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn signature(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[16..]) as usize;
+        let end = molecule::unpack_number(&slice[20..]) as usize;
+        BytesReader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn ext_data(&self) -> Uint32Reader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[20..]) as usize;
+        let end = molecule::unpack_number(&slice[24..]) as usize;
+        Uint32Reader::new_unchecked(&self.as_slice()[start..end])
+    }
+
+    pub fn subkey_proof(&self) -> BytesReader<'r> {
+        let slice = self.as_slice();
+        let start = molecule::unpack_number(&slice[24..]) as usize;
+        if self.has_extra_fields() {
+            let end = molecule::unpack_number(&slice[28..]) as usize;
+            BytesReader::new_unchecked(&self.as_slice()[start..end])
+        } else {
+            BytesReader::new_unchecked(&self.as_slice()[start..])
+        }
     }
 }
-impl<'r> molecule::prelude::Reader<'r> for PubkeyVecReader<'r> {
-    type Entity = PubkeyVec;
+impl<'r> molecule::prelude::Reader<'r> for FriendPubkeyReader<'r> {
+    type Entity = FriendPubkey;
 
-    const NAME: &'static str = "PubkeyVecReader";
+    const NAME: &'static str = "FriendPubkeyReader";
 
     fn to_entity(&self) -> Self::Entity {
         Self::Entity::new_unchecked(self.as_slice().to_owned().into())
     }
 
     fn new_unchecked(slice: &'r [u8]) -> Self {
-        PubkeyVecReader(slice)
+        FriendPubkeyReader(slice)
     }
 
     fn as_slice(&self) -> &'r [u8] {
         self.0
     }
 
-    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
+    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
         use molecule::verification_error as ve;
         let slice_len = slice.len();
         if slice_len < molecule::NUMBER_SIZE {
             return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
         }
-        let item_count = molecule::unpack_number(slice) as usize;
-        if item_count == 0 {
-            if slice_len != molecule::NUMBER_SIZE {
-                return ve!(Self, TotalSizeNotMatch, molecule::NUMBER_SIZE, slice_len);
-            }
-            return Ok(());
-        }
-        let total_size = molecule::NUMBER_SIZE + Self::ITEM_SIZE * item_count;
+        let total_size = molecule::unpack_number(slice) as usize;
         if slice_len != total_size {
             return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
         }
+        if slice_len == molecule::NUMBER_SIZE && Self::FIELD_COUNT == 0 {
+            return Ok(());
+        }
+        if slice_len < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE * 2, slice_len);
+        }
+        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
+        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        if slice_len < offset_first {
+            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
+        }
+        let field_count = offset_first / molecule::NUMBER_SIZE - 1;
+        if field_count < Self::FIELD_COUNT {
+            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
+        } else if !compatible && field_count > Self::FIELD_COUNT {
+            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
+        };
+        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
+            .chunks_exact(molecule::NUMBER_SIZE)
+            .map(|x| molecule::unpack_number(x) as usize)
+            .collect();
+        offsets.push(total_size);
+        if offsets.windows(2).any(|i| i[0] > i[1]) {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        ByteReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
+        Uint16Reader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
+        BytesReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
+        BytesReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
+        Uint32Reader::verify(&slice[offsets[4]..offsets[5]], compatible)?;
+        BytesReader::verify(&slice[offsets[5]..offsets[6]], compatible)?;
         Ok(())
     }
 }
 #[derive(Debug, Default)]
-pub struct PubkeyVecBuilder(pub(crate) Vec<Byte64>);
-impl PubkeyVecBuilder {
-    pub const ITEM_SIZE: usize = 64;
+pub struct FriendPubkeyBuilder {
+    pub(crate) unlock_mode:  Byte,
+    pub(crate) alg_index:    Uint16,
+    pub(crate) pubkey:       Bytes,
+    pub(crate) signature:    Bytes,
+    pub(crate) ext_data:     Uint32,
+    pub(crate) subkey_proof: Bytes,
+}
+impl FriendPubkeyBuilder {
+    pub const FIELD_COUNT: usize = 6;
 
-    pub fn set(mut self, v: Vec<Byte64>) -> Self {
-        self.0 = v;
+    pub fn unlock_mode(mut self, v: Byte) -> Self {
+        self.unlock_mode = v;
         self
     }
 
-    pub fn push(mut self, v: Byte64) -> Self {
-        self.0.push(v);
+    pub fn alg_index(mut self, v: Uint16) -> Self {
+        self.alg_index = v;
         self
     }
 
-    pub fn extend<T: ::core::iter::IntoIterator<Item = Byte64>>(mut self, iter: T) -> Self {
-        for elem in iter {
-            self.0.push(elem);
-        }
+    pub fn pubkey(mut self, v: Bytes) -> Self {
+        self.pubkey = v;
         self
     }
 
-    pub fn replace(&mut self, index: usize, v: Byte64) -> Option<Byte64> {
-        self.0
-            .get_mut(index)
-            .map(|item| ::core::mem::replace(item, v))
+    pub fn signature(mut self, v: Bytes) -> Self {
+        self.signature = v;
+        self
+    }
+
+    pub fn ext_data(mut self, v: Uint32) -> Self {
+        self.ext_data = v;
+        self
+    }
+
+    pub fn subkey_proof(mut self, v: Bytes) -> Self {
+        self.subkey_proof = v;
+        self
     }
 }
-impl molecule::prelude::Builder for PubkeyVecBuilder {
-    type Entity = PubkeyVec;
+impl molecule::prelude::Builder for FriendPubkeyBuilder {
+    type Entity = FriendPubkey;
 
-    const NAME: &'static str = "PubkeyVecBuilder";
+    const NAME: &'static str = "FriendPubkeyBuilder";
 
     fn expected_length(&self) -> usize {
-        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.0.len()
+        molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
+            + self.unlock_mode.as_slice().len()
+            + self.alg_index.as_slice().len()
+            + self.pubkey.as_slice().len()
+            + self.signature.as_slice().len()
+            + self.ext_data.as_slice().len()
+            + self.subkey_proof.as_slice().len()
     }
 
     fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
-        writer.write_all(&molecule::pack_number(self.0.len() as molecule::Number))?;
-        for inner in &self.0[..] {
-            writer.write_all(inner.as_slice())?;
+        let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
+        let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
+        offsets.push(total_size);
+        total_size += self.unlock_mode.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.alg_index.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.pubkey.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.signature.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.ext_data.as_slice().len();
+        offsets.push(total_size);
+        total_size += self.subkey_proof.as_slice().len();
+        writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
+        for offset in offsets.into_iter() {
+            writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
         }
+        writer.write_all(self.unlock_mode.as_slice())?;
+        writer.write_all(self.alg_index.as_slice())?;
+        writer.write_all(self.pubkey.as_slice())?;
+        writer.write_all(self.signature.as_slice())?;
+        writer.write_all(self.ext_data.as_slice())?;
+        writer.write_all(self.subkey_proof.as_slice())?;
         Ok(())
     }
 
@@ -4050,64 +4203,12 @@ impl molecule::prelude::Builder for PubkeyVecBuilder {
         let mut inner = Vec::with_capacity(self.expected_length());
         self.write(&mut inner)
             .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
-        PubkeyVec::new_unchecked(inner.into())
-    }
-}
-pub struct PubkeyVecIterator(PubkeyVec, usize, usize);
-impl ::core::iter::Iterator for PubkeyVecIterator {
-    type Item = Byte64;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.1 >= self.2 {
-            None
-        } else {
-            let ret = self.0.get_unchecked(self.1);
-            self.1 += 1;
-            Some(ret)
-        }
-    }
-}
-impl ::core::iter::ExactSizeIterator for PubkeyVecIterator {
-    fn len(&self) -> usize {
-        self.2 - self.1
-    }
-}
-impl ::core::iter::IntoIterator for PubkeyVec {
-    type IntoIter = PubkeyVecIterator;
-    type Item = Byte64;
-
-    fn into_iter(self) -> Self::IntoIter {
-        let len = self.len();
-        PubkeyVecIterator(self, 0, len)
-    }
-}
-impl<'r> PubkeyVecReader<'r> {
-    pub fn iter<'t>(&'t self) -> PubkeyVecReaderIterator<'t, 'r> {
-        PubkeyVecReaderIterator(&self, 0, self.len())
-    }
-}
-pub struct PubkeyVecReaderIterator<'t, 'r>(&'t PubkeyVecReader<'r>, usize, usize);
-impl<'t: 'r, 'r> ::core::iter::Iterator for PubkeyVecReaderIterator<'t, 'r> {
-    type Item = Byte64Reader<'t>;
-
-    fn next(&mut self) -> Option<Self::Item> {
-        if self.1 >= self.2 {
-            None
-        } else {
-            let ret = self.0.get_unchecked(self.1);
-            self.1 += 1;
-            Some(ret)
-        }
-    }
-}
-impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator for PubkeyVecReaderIterator<'t, 'r> {
-    fn len(&self) -> usize {
-        self.2 - self.1
+        FriendPubkey::new_unchecked(inner.into())
     }
 }
 #[derive(Clone)]
-pub struct SignatureVec(molecule::bytes::Bytes);
-impl ::core::fmt::LowerHex for SignatureVec {
+pub struct FriendPubkeyVec(molecule::bytes::Bytes);
+impl ::core::fmt::LowerHex for FriendPubkeyVec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
         if f.alternate() {
@@ -4116,12 +4217,12 @@ impl ::core::fmt::LowerHex for SignatureVec {
         write!(f, "{}", hex_string(self.as_slice()))
     }
 }
-impl ::core::fmt::Debug for SignatureVec {
+impl ::core::fmt::Debug for FriendPubkeyVec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:#x})", Self::NAME, self)
     }
 }
-impl ::core::fmt::Display for SignatureVec {
+impl ::core::fmt::Display for FriendPubkeyVec {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} [", Self::NAME)?;
         for i in 0..self.len() {
@@ -4134,21 +4235,23 @@ impl ::core::fmt::Display for SignatureVec {
         write!(f, "]")
     }
 }
-impl ::core::default::Default for SignatureVec {
+impl ::core::default::Default for FriendPubkeyVec {
     fn default() -> Self {
-        let v: Vec<u8> = vec![0, 0, 0, 0];
-        SignatureVec::new_unchecked(v.into())
+        let v: Vec<u8> = vec![4, 0, 0, 0];
+        FriendPubkeyVec::new_unchecked(v.into())
     }
 }
-impl SignatureVec {
-    pub const ITEM_SIZE: usize = 64;
-
+impl FriendPubkeyVec {
     pub fn total_size(&self) -> usize {
-        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
+        molecule::unpack_number(self.as_slice()) as usize
     }
 
     pub fn item_count(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -4159,7 +4262,7 @@ impl SignatureVec {
         self.len() == 0
     }
 
-    pub fn get(&self, idx: usize) -> Option<Byte64> {
+    pub fn get(&self, idx: usize) -> Option<FriendPubkey> {
         if idx >= self.len() {
             None
         } else {
@@ -4167,23 +4270,30 @@ impl SignatureVec {
         }
     }
 
-    pub fn get_unchecked(&self, idx: usize) -> Byte64 {
-        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
-        let end = start + Self::ITEM_SIZE;
-        Byte64::new_unchecked(self.0.slice(start..end))
+    pub fn get_unchecked(&self, idx: usize) -> FriendPubkey {
+        let slice = self.as_slice();
+        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
+        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
+        if idx == self.len() - 1 {
+            FriendPubkey::new_unchecked(self.0.slice(start..))
+        } else {
+            let end_idx = start_idx + molecule::NUMBER_SIZE;
+            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
+            FriendPubkey::new_unchecked(self.0.slice(start..end))
+        }
     }
 
-    pub fn as_reader<'r>(&'r self) -> SignatureVecReader<'r> {
-        SignatureVecReader::new_unchecked(self.as_slice())
+    pub fn as_reader<'r>(&'r self) -> FriendPubkeyVecReader<'r> {
+        FriendPubkeyVecReader::new_unchecked(self.as_slice())
     }
 }
-impl molecule::prelude::Entity for SignatureVec {
-    type Builder = SignatureVecBuilder;
+impl molecule::prelude::Entity for FriendPubkeyVec {
+    type Builder = FriendPubkeyVecBuilder;
 
-    const NAME: &'static str = "SignatureVec";
+    const NAME: &'static str = "FriendPubkeyVec";
 
     fn new_unchecked(data: molecule::bytes::Bytes) -> Self {
-        SignatureVec(data)
+        FriendPubkeyVec(data)
     }
 
     fn as_bytes(&self) -> molecule::bytes::Bytes {
@@ -4195,11 +4305,11 @@ impl molecule::prelude::Entity for SignatureVec {
     }
 
     fn from_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
-        SignatureVecReader::from_slice(slice).map(|reader| reader.to_entity())
+        FriendPubkeyVecReader::from_slice(slice).map(|reader| reader.to_entity())
     }
 
     fn from_compatible_slice(slice: &[u8]) -> molecule::error::VerificationResult<Self> {
-        SignatureVecReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
+        FriendPubkeyVecReader::from_compatible_slice(slice).map(|reader| reader.to_entity())
     }
 
     fn new_builder() -> Self::Builder {
@@ -4211,8 +4321,8 @@ impl molecule::prelude::Entity for SignatureVec {
     }
 }
 #[derive(Clone, Copy)]
-pub struct SignatureVecReader<'r>(&'r [u8]);
-impl<'r> ::core::fmt::LowerHex for SignatureVecReader<'r> {
+pub struct FriendPubkeyVecReader<'r>(&'r [u8]);
+impl<'r> ::core::fmt::LowerHex for FriendPubkeyVecReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         use molecule::hex_string;
         if f.alternate() {
@@ -4221,12 +4331,12 @@ impl<'r> ::core::fmt::LowerHex for SignatureVecReader<'r> {
         write!(f, "{}", hex_string(self.as_slice()))
     }
 }
-impl<'r> ::core::fmt::Debug for SignatureVecReader<'r> {
+impl<'r> ::core::fmt::Debug for FriendPubkeyVecReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{}({:#x})", Self::NAME, self)
     }
 }
-impl<'r> ::core::fmt::Display for SignatureVecReader<'r> {
+impl<'r> ::core::fmt::Display for FriendPubkeyVecReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} [", Self::NAME)?;
         for i in 0..self.len() {
@@ -4239,15 +4349,17 @@ impl<'r> ::core::fmt::Display for SignatureVecReader<'r> {
         write!(f, "]")
     }
 }
-impl<'r> SignatureVecReader<'r> {
-    pub const ITEM_SIZE: usize = 64;
-
+impl<'r> FriendPubkeyVecReader<'r> {
     pub fn total_size(&self) -> usize {
-        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
+        molecule::unpack_number(self.as_slice()) as usize
     }
 
     pub fn item_count(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
+        if self.total_size() == molecule::NUMBER_SIZE {
+            0
+        } else {
+            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
+        }
     }
 
     pub fn len(&self) -> usize {
@@ -4258,7 +4370,7 @@ impl<'r> SignatureVecReader<'r> {
         self.len() == 0
     }
 
-    pub fn get(&self, idx: usize) -> Option<Byte64Reader<'r>> {
+    pub fn get(&self, idx: usize) -> Option<FriendPubkeyReader<'r>> {
         if idx >= self.len() {
             None
         } else {
@@ -4266,90 +4378,144 @@ impl<'r> SignatureVecReader<'r> {
         }
     }
 
-    pub fn get_unchecked(&self, idx: usize) -> Byte64Reader<'r> {
-        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
-        let end = start + Self::ITEM_SIZE;
-        Byte64Reader::new_unchecked(&self.as_slice()[start..end])
+    pub fn get_unchecked(&self, idx: usize) -> FriendPubkeyReader<'r> {
+        let slice = self.as_slice();
+        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
+        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
+        if idx == self.len() - 1 {
+            FriendPubkeyReader::new_unchecked(&self.as_slice()[start..])
+        } else {
+            let end_idx = start_idx + molecule::NUMBER_SIZE;
+            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
+            FriendPubkeyReader::new_unchecked(&self.as_slice()[start..end])
+        }
     }
 }
-impl<'r> molecule::prelude::Reader<'r> for SignatureVecReader<'r> {
-    type Entity = SignatureVec;
+impl<'r> molecule::prelude::Reader<'r> for FriendPubkeyVecReader<'r> {
+    type Entity = FriendPubkeyVec;
 
-    const NAME: &'static str = "SignatureVecReader";
+    const NAME: &'static str = "FriendPubkeyVecReader";
 
     fn to_entity(&self) -> Self::Entity {
         Self::Entity::new_unchecked(self.as_slice().to_owned().into())
     }
 
     fn new_unchecked(slice: &'r [u8]) -> Self {
-        SignatureVecReader(slice)
+        FriendPubkeyVecReader(slice)
     }
 
     fn as_slice(&self) -> &'r [u8] {
         self.0
     }
 
-    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
+    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
         use molecule::verification_error as ve;
         let slice_len = slice.len();
         if slice_len < molecule::NUMBER_SIZE {
             return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
         }
-        let item_count = molecule::unpack_number(slice) as usize;
-        if item_count == 0 {
-            if slice_len != molecule::NUMBER_SIZE {
-                return ve!(Self, TotalSizeNotMatch, molecule::NUMBER_SIZE, slice_len);
-            }
-            return Ok(());
-        }
-        let total_size = molecule::NUMBER_SIZE + Self::ITEM_SIZE * item_count;
+        let total_size = molecule::unpack_number(slice) as usize;
         if slice_len != total_size {
             return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
+        }
+        if slice_len == molecule::NUMBER_SIZE {
+            return Ok(());
+        }
+        if slice_len < molecule::NUMBER_SIZE * 2 {
+            return ve!(
+                Self,
+                TotalSizeNotMatch,
+                molecule::NUMBER_SIZE * 2,
+                slice_len
+            );
+        }
+        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
+        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        if slice_len < offset_first {
+            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
+        }
+        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
+            .chunks_exact(molecule::NUMBER_SIZE)
+            .map(|x| molecule::unpack_number(x) as usize)
+            .collect();
+        offsets.push(total_size);
+        if offsets.windows(2).any(|i| i[0] > i[1]) {
+            return ve!(Self, OffsetsNotMatch);
+        }
+        for pair in offsets.windows(2) {
+            let start = pair[0];
+            let end = pair[1];
+            FriendPubkeyReader::verify(&slice[start..end], compatible)?;
         }
         Ok(())
     }
 }
 #[derive(Debug, Default)]
-pub struct SignatureVecBuilder(pub(crate) Vec<Byte64>);
-impl SignatureVecBuilder {
-    pub const ITEM_SIZE: usize = 64;
-
-    pub fn set(mut self, v: Vec<Byte64>) -> Self {
+pub struct FriendPubkeyVecBuilder(pub(crate) Vec<FriendPubkey>);
+impl FriendPubkeyVecBuilder {
+    pub fn set(mut self, v: Vec<FriendPubkey>) -> Self {
         self.0 = v;
         self
     }
 
-    pub fn push(mut self, v: Byte64) -> Self {
+    pub fn push(mut self, v: FriendPubkey) -> Self {
         self.0.push(v);
         self
     }
 
-    pub fn extend<T: ::core::iter::IntoIterator<Item = Byte64>>(mut self, iter: T) -> Self {
+    pub fn extend<T: ::core::iter::IntoIterator<Item = FriendPubkey>>(mut self, iter: T) -> Self {
         for elem in iter {
             self.0.push(elem);
         }
         self
     }
 
-    pub fn replace(&mut self, index: usize, v: Byte64) -> Option<Byte64> {
+    pub fn replace(&mut self, index: usize, v: FriendPubkey) -> Option<FriendPubkey> {
         self.0
             .get_mut(index)
             .map(|item| ::core::mem::replace(item, v))
     }
 }
-impl molecule::prelude::Builder for SignatureVecBuilder {
-    type Entity = SignatureVec;
+impl molecule::prelude::Builder for FriendPubkeyVecBuilder {
+    type Entity = FriendPubkeyVec;
 
-    const NAME: &'static str = "SignatureVecBuilder";
+    const NAME: &'static str = "FriendPubkeyVecBuilder";
 
     fn expected_length(&self) -> usize {
-        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.0.len()
+        molecule::NUMBER_SIZE * (self.0.len() + 1)
+            + self
+                .0
+                .iter()
+                .map(|inner| inner.as_slice().len())
+                .sum::<usize>()
     }
 
     fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
-        writer.write_all(&molecule::pack_number(self.0.len() as molecule::Number))?;
-        for inner in &self.0[..] {
-            writer.write_all(inner.as_slice())?;
+        let item_count = self.0.len();
+        if item_count == 0 {
+            writer.write_all(&molecule::pack_number(
+                molecule::NUMBER_SIZE as molecule::Number,
+            ))?;
+        } else {
+            let (total_size, offsets) = self.0.iter().fold(
+                (
+                    molecule::NUMBER_SIZE * (item_count + 1),
+                    Vec::with_capacity(item_count),
+                ),
+                |(start, mut offsets), inner| {
+                    offsets.push(start);
+                    (start + inner.as_slice().len(), offsets)
+                },
+            );
+            writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
+            for offset in offsets.into_iter() {
+                writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
+            }
+            for inner in self.0.iter() {
+                writer.write_all(inner.as_slice())?;
+            }
         }
         Ok(())
     }
@@ -4358,12 +4524,12 @@ impl molecule::prelude::Builder for SignatureVecBuilder {
         let mut inner = Vec::with_capacity(self.expected_length());
         self.write(&mut inner)
             .unwrap_or_else(|_| panic!("{} build should be ok", Self::NAME));
-        SignatureVec::new_unchecked(inner.into())
+        FriendPubkeyVec::new_unchecked(inner.into())
     }
 }
-pub struct SignatureVecIterator(SignatureVec, usize, usize);
-impl ::core::iter::Iterator for SignatureVecIterator {
-    type Item = Byte64;
+pub struct FriendPubkeyVecIterator(FriendPubkeyVec, usize, usize);
+impl ::core::iter::Iterator for FriendPubkeyVecIterator {
+    type Item = FriendPubkey;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 >= self.2 {
@@ -4375,28 +4541,28 @@ impl ::core::iter::Iterator for SignatureVecIterator {
         }
     }
 }
-impl ::core::iter::ExactSizeIterator for SignatureVecIterator {
+impl ::core::iter::ExactSizeIterator for FriendPubkeyVecIterator {
     fn len(&self) -> usize {
         self.2 - self.1
     }
 }
-impl ::core::iter::IntoIterator for SignatureVec {
-    type IntoIter = SignatureVecIterator;
-    type Item = Byte64;
+impl ::core::iter::IntoIterator for FriendPubkeyVec {
+    type IntoIter = FriendPubkeyVecIterator;
+    type Item = FriendPubkey;
 
     fn into_iter(self) -> Self::IntoIter {
         let len = self.len();
-        SignatureVecIterator(self, 0, len)
+        FriendPubkeyVecIterator(self, 0, len)
     }
 }
-impl<'r> SignatureVecReader<'r> {
-    pub fn iter<'t>(&'t self) -> SignatureVecReaderIterator<'t, 'r> {
-        SignatureVecReaderIterator(&self, 0, self.len())
+impl<'r> FriendPubkeyVecReader<'r> {
+    pub fn iter<'t>(&'t self) -> FriendPubkeyVecReaderIterator<'t, 'r> {
+        FriendPubkeyVecReaderIterator(&self, 0, self.len())
     }
 }
-pub struct SignatureVecReaderIterator<'t, 'r>(&'t SignatureVecReader<'r>, usize, usize);
-impl<'t: 'r, 'r> ::core::iter::Iterator for SignatureVecReaderIterator<'t, 'r> {
-    type Item = Byte64Reader<'t>;
+pub struct FriendPubkeyVecReaderIterator<'t, 'r>(&'t FriendPubkeyVecReader<'r>, usize, usize);
+impl<'t: 'r, 'r> ::core::iter::Iterator for FriendPubkeyVecReaderIterator<'t, 'r> {
+    type Item = FriendPubkeyReader<'t>;
 
     fn next(&mut self) -> Option<Self::Item> {
         if self.1 >= self.2 {
@@ -4408,7 +4574,7 @@ impl<'t: 'r, 'r> ::core::iter::Iterator for SignatureVecReaderIterator<'t, 'r> {
         }
     }
 }
-impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator for SignatureVecReaderIterator<'t, 'r> {
+impl<'t: 'r, 'r> ::core::iter::ExactSizeIterator for FriendPubkeyVecReaderIterator<'t, 'r> {
     fn len(&self) -> usize {
         self.2 - self.1
     }
@@ -4434,8 +4600,7 @@ impl ::core::fmt::Display for SocialUnlockEntries {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "social_value", self.social_value())?;
         write!(f, ", {}: {}", "social_proof", self.social_proof())?;
-        write!(f, ", {}: {}", "pubkeys", self.pubkeys())?;
-        write!(f, ", {}: {}", "signatures", self.signatures())?;
+        write!(f, ", {}: {}", "social_friends", self.social_friends())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -4446,15 +4611,14 @@ impl ::core::fmt::Display for SocialUnlockEntries {
 impl ::core::default::Default for SocialUnlockEntries {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            59, 0, 0, 0, 20, 0, 0, 0, 47, 0, 0, 0, 51, 0, 0, 0, 55, 0, 0, 0, 27, 0, 0, 0, 20, 0, 0,
-            0, 21, 0, 0, 0, 22, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0,
+            51, 0, 0, 0, 16, 0, 0, 0, 43, 0, 0, 0, 47, 0, 0, 0, 27, 0, 0, 0, 20, 0, 0, 0, 21, 0, 0,
+            0, 22, 0, 0, 0, 23, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0,
         ];
         SocialUnlockEntries::new_unchecked(v.into())
     }
 }
 impl SocialUnlockEntries {
-    pub const FIELD_COUNT: usize = 4;
+    pub const FIELD_COUNT: usize = 3;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -4490,21 +4654,14 @@ impl SocialUnlockEntries {
         Bytes::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn pubkeys(&self) -> PubkeyVec {
+    pub fn social_friends(&self) -> FriendPubkeyVec {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
-        let end = molecule::unpack_number(&slice[16..]) as usize;
-        PubkeyVec::new_unchecked(self.0.slice(start..end))
-    }
-
-    pub fn signatures(&self) -> SignatureVec {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[16..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[20..]) as usize;
-            SignatureVec::new_unchecked(self.0.slice(start..end))
+            let end = molecule::unpack_number(&slice[16..]) as usize;
+            FriendPubkeyVec::new_unchecked(self.0.slice(start..end))
         } else {
-            SignatureVec::new_unchecked(self.0.slice(start..))
+            FriendPubkeyVec::new_unchecked(self.0.slice(start..))
         }
     }
 
@@ -4545,8 +4702,7 @@ impl molecule::prelude::Entity for SocialUnlockEntries {
         Self::new_builder()
             .social_value(self.social_value())
             .social_proof(self.social_proof())
-            .pubkeys(self.pubkeys())
-            .signatures(self.signatures())
+            .social_friends(self.social_friends())
     }
 }
 #[derive(Clone, Copy)]
@@ -4570,8 +4726,7 @@ impl<'r> ::core::fmt::Display for SocialUnlockEntriesReader<'r> {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "social_value", self.social_value())?;
         write!(f, ", {}: {}", "social_proof", self.social_proof())?;
-        write!(f, ", {}: {}", "pubkeys", self.pubkeys())?;
-        write!(f, ", {}: {}", "signatures", self.signatures())?;
+        write!(f, ", {}: {}", "social_friends", self.social_friends())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
             write!(f, ", .. ({} fields)", extra_count)?;
@@ -4580,7 +4735,7 @@ impl<'r> ::core::fmt::Display for SocialUnlockEntriesReader<'r> {
     }
 }
 impl<'r> SocialUnlockEntriesReader<'r> {
-    pub const FIELD_COUNT: usize = 4;
+    pub const FIELD_COUNT: usize = 3;
 
     pub fn total_size(&self) -> usize {
         molecule::unpack_number(self.as_slice()) as usize
@@ -4616,21 +4771,14 @@ impl<'r> SocialUnlockEntriesReader<'r> {
         BytesReader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn pubkeys(&self) -> PubkeyVecReader<'r> {
+    pub fn social_friends(&self) -> FriendPubkeyVecReader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[12..]) as usize;
-        let end = molecule::unpack_number(&slice[16..]) as usize;
-        PubkeyVecReader::new_unchecked(&self.as_slice()[start..end])
-    }
-
-    pub fn signatures(&self) -> SignatureVecReader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[16..]) as usize;
         if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[20..]) as usize;
-            SignatureVecReader::new_unchecked(&self.as_slice()[start..end])
+            let end = molecule::unpack_number(&slice[16..]) as usize;
+            FriendPubkeyVecReader::new_unchecked(&self.as_slice()[start..end])
         } else {
-            SignatureVecReader::new_unchecked(&self.as_slice()[start..])
+            FriendPubkeyVecReader::new_unchecked(&self.as_slice()[start..])
         }
     }
 }
@@ -4690,20 +4838,18 @@ impl<'r> molecule::prelude::Reader<'r> for SocialUnlockEntriesReader<'r> {
         }
         SocialValueReader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
         BytesReader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
-        PubkeyVecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
-        SignatureVecReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
+        FriendPubkeyVecReader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
         Ok(())
     }
 }
 #[derive(Debug, Default)]
 pub struct SocialUnlockEntriesBuilder {
-    pub(crate) social_value: SocialValue,
-    pub(crate) social_proof: Bytes,
-    pub(crate) pubkeys:      PubkeyVec,
-    pub(crate) signatures:   SignatureVec,
+    pub(crate) social_value:   SocialValue,
+    pub(crate) social_proof:   Bytes,
+    pub(crate) social_friends: FriendPubkeyVec,
 }
 impl SocialUnlockEntriesBuilder {
-    pub const FIELD_COUNT: usize = 4;
+    pub const FIELD_COUNT: usize = 3;
 
     pub fn social_value(mut self, v: SocialValue) -> Self {
         self.social_value = v;
@@ -4715,13 +4861,8 @@ impl SocialUnlockEntriesBuilder {
         self
     }
 
-    pub fn pubkeys(mut self, v: PubkeyVec) -> Self {
-        self.pubkeys = v;
-        self
-    }
-
-    pub fn signatures(mut self, v: SignatureVec) -> Self {
-        self.signatures = v;
+    pub fn social_friends(mut self, v: FriendPubkeyVec) -> Self {
+        self.social_friends = v;
         self
     }
 }
@@ -4734,8 +4875,7 @@ impl molecule::prelude::Builder for SocialUnlockEntriesBuilder {
         molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
             + self.social_value.as_slice().len()
             + self.social_proof.as_slice().len()
-            + self.pubkeys.as_slice().len()
-            + self.signatures.as_slice().len()
+            + self.social_friends.as_slice().len()
     }
 
     fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
@@ -4746,17 +4886,14 @@ impl molecule::prelude::Builder for SocialUnlockEntriesBuilder {
         offsets.push(total_size);
         total_size += self.social_proof.as_slice().len();
         offsets.push(total_size);
-        total_size += self.pubkeys.as_slice().len();
-        offsets.push(total_size);
-        total_size += self.signatures.as_slice().len();
+        total_size += self.social_friends.as_slice().len();
         writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
         for offset in offsets.into_iter() {
             writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
         }
         writer.write_all(self.social_value.as_slice())?;
         writer.write_all(self.social_proof.as_slice())?;
-        writer.write_all(self.pubkeys.as_slice())?;
-        writer.write_all(self.signatures.as_slice())?;
+        writer.write_all(self.social_friends.as_slice())?;
         Ok(())
     }
 
