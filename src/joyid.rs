@@ -629,7 +629,7 @@ impl ::core::fmt::Debug for SubValue {
 impl ::core::fmt::Display for SubValue {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "key_type", self.key_type())?;
+        write!(f, "{}: {}", "alg_index", self.alg_index())?;
         write!(f, ", {}: {}", "pubkey_hash", self.pubkey_hash())?;
         write!(f, ", {}: {}", "reserved", self.reserved())?;
         write!(f, ", {}: {}", "padding", self.padding())?;
@@ -672,7 +672,7 @@ impl SubValue {
         Self::FIELD_COUNT != self.field_count()
     }
 
-    pub fn key_type(&self) -> Uint16 {
+    pub fn alg_index(&self) -> Uint16 {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[4..]) as usize;
         let end = molecule::unpack_number(&slice[8..]) as usize;
@@ -739,7 +739,7 @@ impl molecule::prelude::Entity for SubValue {
 
     fn as_builder(self) -> Self::Builder {
         Self::new_builder()
-            .key_type(self.key_type())
+            .alg_index(self.alg_index())
             .pubkey_hash(self.pubkey_hash())
             .reserved(self.reserved())
             .padding(self.padding())
@@ -764,7 +764,7 @@ impl<'r> ::core::fmt::Debug for SubValueReader<'r> {
 impl<'r> ::core::fmt::Display for SubValueReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
-        write!(f, "{}: {}", "key_type", self.key_type())?;
+        write!(f, "{}: {}", "alg_index", self.alg_index())?;
         write!(f, ", {}: {}", "pubkey_hash", self.pubkey_hash())?;
         write!(f, ", {}: {}", "reserved", self.reserved())?;
         write!(f, ", {}: {}", "padding", self.padding())?;
@@ -798,7 +798,7 @@ impl<'r> SubValueReader<'r> {
         Self::FIELD_COUNT != self.field_count()
     }
 
-    pub fn key_type(&self) -> Uint16Reader<'r> {
+    pub fn alg_index(&self) -> Uint16Reader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[4..]) as usize;
         let end = molecule::unpack_number(&slice[8..]) as usize;
@@ -893,7 +893,7 @@ impl<'r> molecule::prelude::Reader<'r> for SubValueReader<'r> {
 }
 #[derive(Debug, Default)]
 pub struct SubValueBuilder {
-    pub(crate) key_type:    Uint16,
+    pub(crate) alg_index:   Uint16,
     pub(crate) pubkey_hash: Byte20,
     pub(crate) reserved:    Byte9,
     pub(crate) padding:     Byte,
@@ -901,8 +901,8 @@ pub struct SubValueBuilder {
 impl SubValueBuilder {
     pub const FIELD_COUNT: usize = 4;
 
-    pub fn key_type(mut self, v: Uint16) -> Self {
-        self.key_type = v;
+    pub fn alg_index(mut self, v: Uint16) -> Self {
+        self.alg_index = v;
         self
     }
 
@@ -928,7 +928,7 @@ impl molecule::prelude::Builder for SubValueBuilder {
 
     fn expected_length(&self) -> usize {
         molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
-            + self.key_type.as_slice().len()
+            + self.alg_index.as_slice().len()
             + self.pubkey_hash.as_slice().len()
             + self.reserved.as_slice().len()
             + self.padding.as_slice().len()
@@ -938,7 +938,7 @@ impl molecule::prelude::Builder for SubValueBuilder {
         let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
         let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
         offsets.push(total_size);
-        total_size += self.key_type.as_slice().len();
+        total_size += self.alg_index.as_slice().len();
         offsets.push(total_size);
         total_size += self.pubkey_hash.as_slice().len();
         offsets.push(total_size);
@@ -949,7 +949,7 @@ impl molecule::prelude::Builder for SubValueBuilder {
         for offset in offsets.into_iter() {
             writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
         }
-        writer.write_all(self.key_type.as_slice())?;
+        writer.write_all(self.alg_index.as_slice())?;
         writer.write_all(self.pubkey_hash.as_slice())?;
         writer.write_all(self.reserved.as_slice())?;
         writer.write_all(self.padding.as_slice())?;
@@ -1958,7 +1958,7 @@ impl ::core::fmt::Display for SubKeyUnlockEntries {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "ext_data", self.ext_data())?;
-        write!(f, ", {}: {}", "key_type", self.key_type())?;
+        write!(f, ", {}: {}", "alg_index", self.alg_index())?;
         write!(f, ", {}: {}", "subkey_proof", self.subkey_proof())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -2005,7 +2005,7 @@ impl SubKeyUnlockEntries {
         Uint32::new_unchecked(self.0.slice(start..end))
     }
 
-    pub fn key_type(&self) -> Uint16 {
+    pub fn alg_index(&self) -> Uint16 {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[8..]) as usize;
         let end = molecule::unpack_number(&slice[12..]) as usize;
@@ -2059,7 +2059,7 @@ impl molecule::prelude::Entity for SubKeyUnlockEntries {
     fn as_builder(self) -> Self::Builder {
         Self::new_builder()
             .ext_data(self.ext_data())
-            .key_type(self.key_type())
+            .alg_index(self.alg_index())
             .subkey_proof(self.subkey_proof())
     }
 }
@@ -2083,7 +2083,7 @@ impl<'r> ::core::fmt::Display for SubKeyUnlockEntriesReader<'r> {
     fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
         write!(f, "{} {{ ", Self::NAME)?;
         write!(f, "{}: {}", "ext_data", self.ext_data())?;
-        write!(f, ", {}: {}", "key_type", self.key_type())?;
+        write!(f, ", {}: {}", "alg_index", self.alg_index())?;
         write!(f, ", {}: {}", "subkey_proof", self.subkey_proof())?;
         let extra_count = self.count_extra_fields();
         if extra_count != 0 {
@@ -2122,7 +2122,7 @@ impl<'r> SubKeyUnlockEntriesReader<'r> {
         Uint32Reader::new_unchecked(&self.as_slice()[start..end])
     }
 
-    pub fn key_type(&self) -> Uint16Reader<'r> {
+    pub fn alg_index(&self) -> Uint16Reader<'r> {
         let slice = self.as_slice();
         let start = molecule::unpack_number(&slice[8..]) as usize;
         let end = molecule::unpack_number(&slice[12..]) as usize;
@@ -2203,7 +2203,7 @@ impl<'r> molecule::prelude::Reader<'r> for SubKeyUnlockEntriesReader<'r> {
 #[derive(Debug, Default)]
 pub struct SubKeyUnlockEntriesBuilder {
     pub(crate) ext_data:     Uint32,
-    pub(crate) key_type:     Uint16,
+    pub(crate) alg_index:    Uint16,
     pub(crate) subkey_proof: Bytes,
 }
 impl SubKeyUnlockEntriesBuilder {
@@ -2214,8 +2214,8 @@ impl SubKeyUnlockEntriesBuilder {
         self
     }
 
-    pub fn key_type(mut self, v: Uint16) -> Self {
-        self.key_type = v;
+    pub fn alg_index(mut self, v: Uint16) -> Self {
+        self.alg_index = v;
         self
     }
 
@@ -2232,7 +2232,7 @@ impl molecule::prelude::Builder for SubKeyUnlockEntriesBuilder {
     fn expected_length(&self) -> usize {
         molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
             + self.ext_data.as_slice().len()
-            + self.key_type.as_slice().len()
+            + self.alg_index.as_slice().len()
             + self.subkey_proof.as_slice().len()
     }
 
@@ -2242,7 +2242,7 @@ impl molecule::prelude::Builder for SubKeyUnlockEntriesBuilder {
         offsets.push(total_size);
         total_size += self.ext_data.as_slice().len();
         offsets.push(total_size);
-        total_size += self.key_type.as_slice().len();
+        total_size += self.alg_index.as_slice().len();
         offsets.push(total_size);
         total_size += self.subkey_proof.as_slice().len();
         writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
@@ -2250,7 +2250,7 @@ impl molecule::prelude::Builder for SubKeyUnlockEntriesBuilder {
             writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
         }
         writer.write_all(self.ext_data.as_slice())?;
-        writer.write_all(self.key_type.as_slice())?;
+        writer.write_all(self.alg_index.as_slice())?;
         writer.write_all(self.subkey_proof.as_slice())?;
         Ok(())
     }

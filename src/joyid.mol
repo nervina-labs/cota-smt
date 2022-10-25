@@ -9,7 +9,7 @@ struct SubKey {
   reserved: Byte20,
 }
 table SubValue {
-  key_type: Uint16,   
+  alg_index: Uint16,   
   pubkey_hash: Byte20,
   reserved: Byte9,
   padding: byte,     
@@ -23,7 +23,7 @@ table SubKeyEntries {
 
 table SubKeyUnlockEntries {
   ext_data: Uint32,    
-  key_type: Uint16,    
+  alg_index: Uint16,    
   subkey_proof: Bytes, 
 }
 
