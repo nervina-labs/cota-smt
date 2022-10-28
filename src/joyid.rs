@@ -633,75 +633,37 @@ impl ::core::fmt::Display for SubValue {
         write!(f, ", {}: {}", "pubkey_hash", self.pubkey_hash())?;
         write!(f, ", {}: {}", "reserved", self.reserved())?;
         write!(f, ", {}: {}", "padding", self.padding())?;
-        let extra_count = self.count_extra_fields();
-        if extra_count != 0 {
-            write!(f, ", .. ({} fields)", extra_count)?;
-        }
         write!(f, " }}")
     }
 }
 impl ::core::default::Default for SubValue {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            52, 0, 0, 0, 20, 0, 0, 0, 22, 0, 0, 0, 42, 0, 0, 0, 51, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
-            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+            0, 0, 0,
         ];
         SubValue::new_unchecked(v.into())
     }
 }
 impl SubValue {
     pub const FIELD_COUNT: usize = 4;
-
-    pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
-    }
-
-    pub fn field_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
-    }
-
-    pub fn count_extra_fields(&self) -> usize {
-        self.field_count() - Self::FIELD_COUNT
-    }
-
-    pub fn has_extra_fields(&self) -> bool {
-        Self::FIELD_COUNT != self.field_count()
-    }
+    pub const FIELD_SIZES: [usize; 4] = [2, 20, 9, 1];
+    pub const TOTAL_SIZE: usize = 32;
 
     pub fn alg_index(&self) -> Uint16 {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[4..]) as usize;
-        let end = molecule::unpack_number(&slice[8..]) as usize;
-        Uint16::new_unchecked(self.0.slice(start..end))
+        Uint16::new_unchecked(self.0.slice(0..2))
     }
 
     pub fn pubkey_hash(&self) -> Byte20 {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[8..]) as usize;
-        let end = molecule::unpack_number(&slice[12..]) as usize;
-        Byte20::new_unchecked(self.0.slice(start..end))
+        Byte20::new_unchecked(self.0.slice(2..22))
     }
 
     pub fn reserved(&self) -> Byte9 {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[12..]) as usize;
-        let end = molecule::unpack_number(&slice[16..]) as usize;
-        Byte9::new_unchecked(self.0.slice(start..end))
+        Byte9::new_unchecked(self.0.slice(22..31))
     }
 
     pub fn padding(&self) -> Byte {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[16..]) as usize;
-        if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[20..]) as usize;
-            Byte::new_unchecked(self.0.slice(start..end))
-        } else {
-            Byte::new_unchecked(self.0.slice(start..))
-        }
+        Byte::new_unchecked(self.0.slice(31..32))
     }
 
     pub fn as_reader<'r>(&'r self) -> SubValueReader<'r> {
@@ -768,66 +730,28 @@ impl<'r> ::core::fmt::Display for SubValueReader<'r> {
         write!(f, ", {}: {}", "pubkey_hash", self.pubkey_hash())?;
         write!(f, ", {}: {}", "reserved", self.reserved())?;
         write!(f, ", {}: {}", "padding", self.padding())?;
-        let extra_count = self.count_extra_fields();
-        if extra_count != 0 {
-            write!(f, ", .. ({} fields)", extra_count)?;
-        }
         write!(f, " }}")
     }
 }
 impl<'r> SubValueReader<'r> {
     pub const FIELD_COUNT: usize = 4;
-
-    pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
-    }
-
-    pub fn field_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
-    }
-
-    pub fn count_extra_fields(&self) -> usize {
-        self.field_count() - Self::FIELD_COUNT
-    }
-
-    pub fn has_extra_fields(&self) -> bool {
-        Self::FIELD_COUNT != self.field_count()
-    }
+    pub const FIELD_SIZES: [usize; 4] = [2, 20, 9, 1];
+    pub const TOTAL_SIZE: usize = 32;
 
     pub fn alg_index(&self) -> Uint16Reader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[4..]) as usize;
-        let end = molecule::unpack_number(&slice[8..]) as usize;
-        Uint16Reader::new_unchecked(&self.as_slice()[start..end])
+        Uint16Reader::new_unchecked(&self.as_slice()[0..2])
     }
 
     pub fn pubkey_hash(&self) -> Byte20Reader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[8..]) as usize;
-        let end = molecule::unpack_number(&slice[12..]) as usize;
-        Byte20Reader::new_unchecked(&self.as_slice()[start..end])
+        Byte20Reader::new_unchecked(&self.as_slice()[2..22])
     }
 
     pub fn reserved(&self) -> Byte9Reader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[12..]) as usize;
-        let end = molecule::unpack_number(&slice[16..]) as usize;
-        Byte9Reader::new_unchecked(&self.as_slice()[start..end])
+        Byte9Reader::new_unchecked(&self.as_slice()[22..31])
     }
 
     pub fn padding(&self) -> ByteReader<'r> {
-        let slice = self.as_slice();
-        let start = molecule::unpack_number(&slice[16..]) as usize;
-        if self.has_extra_fields() {
-            let end = molecule::unpack_number(&slice[20..]) as usize;
-            ByteReader::new_unchecked(&self.as_slice()[start..end])
-        } else {
-            ByteReader::new_unchecked(&self.as_slice()[start..])
-        }
+        ByteReader::new_unchecked(&self.as_slice()[31..32])
     }
 }
 impl<'r> molecule::prelude::Reader<'r> for SubValueReader<'r> {
@@ -847,47 +771,12 @@ impl<'r> molecule::prelude::Reader<'r> for SubValueReader<'r> {
         self.0
     }
 
-    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
         use molecule::verification_error as ve;
         let slice_len = slice.len();
-        if slice_len < molecule::NUMBER_SIZE {
-            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
+        if slice_len != Self::TOTAL_SIZE {
+            return ve!(Self, TotalSizeNotMatch, Self::TOTAL_SIZE, slice_len);
         }
-        let total_size = molecule::unpack_number(slice) as usize;
-        if slice_len != total_size {
-            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
-        }
-        if slice_len == molecule::NUMBER_SIZE && Self::FIELD_COUNT == 0 {
-            return Ok(());
-        }
-        if slice_len < molecule::NUMBER_SIZE * 2 {
-            return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE * 2, slice_len);
-        }
-        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
-        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        if slice_len < offset_first {
-            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
-        }
-        let field_count = offset_first / molecule::NUMBER_SIZE - 1;
-        if field_count < Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        } else if !compatible && field_count > Self::FIELD_COUNT {
-            return ve!(Self, FieldCountNotMatch, Self::FIELD_COUNT, field_count);
-        };
-        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
-            .chunks_exact(molecule::NUMBER_SIZE)
-            .map(|x| molecule::unpack_number(x) as usize)
-            .collect();
-        offsets.push(total_size);
-        if offsets.windows(2).any(|i| i[0] > i[1]) {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        Uint16Reader::verify(&slice[offsets[0]..offsets[1]], compatible)?;
-        Byte20Reader::verify(&slice[offsets[1]..offsets[2]], compatible)?;
-        Byte9Reader::verify(&slice[offsets[2]..offsets[3]], compatible)?;
-        ByteReader::verify(&slice[offsets[3]..offsets[4]], compatible)?;
         Ok(())
     }
 }
@@ -900,6 +789,8 @@ pub struct SubValueBuilder {
 }
 impl SubValueBuilder {
     pub const FIELD_COUNT: usize = 4;
+    pub const FIELD_SIZES: [usize; 4] = [2, 20, 9, 1];
+    pub const TOTAL_SIZE: usize = 32;
 
     pub fn alg_index(mut self, v: Uint16) -> Self {
         self.alg_index = v;
@@ -927,28 +818,10 @@ impl molecule::prelude::Builder for SubValueBuilder {
     const NAME: &'static str = "SubValueBuilder";
 
     fn expected_length(&self) -> usize {
-        molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1)
-            + self.alg_index.as_slice().len()
-            + self.pubkey_hash.as_slice().len()
-            + self.reserved.as_slice().len()
-            + self.padding.as_slice().len()
+        Self::TOTAL_SIZE
     }
 
     fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
-        let mut total_size = molecule::NUMBER_SIZE * (Self::FIELD_COUNT + 1);
-        let mut offsets = Vec::with_capacity(Self::FIELD_COUNT);
-        offsets.push(total_size);
-        total_size += self.alg_index.as_slice().len();
-        offsets.push(total_size);
-        total_size += self.pubkey_hash.as_slice().len();
-        offsets.push(total_size);
-        total_size += self.reserved.as_slice().len();
-        offsets.push(total_size);
-        total_size += self.padding.as_slice().len();
-        writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
-        for offset in offsets.into_iter() {
-            writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
-        }
         writer.write_all(self.alg_index.as_slice())?;
         writer.write_all(self.pubkey_hash.as_slice())?;
         writer.write_all(self.reserved.as_slice())?;
@@ -1302,21 +1175,19 @@ impl ::core::fmt::Display for SubValueVec {
 }
 impl ::core::default::Default for SubValueVec {
     fn default() -> Self {
-        let v: Vec<u8> = vec![4, 0, 0, 0];
+        let v: Vec<u8> = vec![0, 0, 0, 0];
         SubValueVec::new_unchecked(v.into())
     }
 }
 impl SubValueVec {
+    pub const ITEM_SIZE: usize = 32;
+
     pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
     }
 
     pub fn item_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
+        molecule::unpack_number(self.as_slice()) as usize
     }
 
     pub fn len(&self) -> usize {
@@ -1336,16 +1207,9 @@ impl SubValueVec {
     }
 
     pub fn get_unchecked(&self, idx: usize) -> SubValue {
-        let slice = self.as_slice();
-        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
-        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
-        if idx == self.len() - 1 {
-            SubValue::new_unchecked(self.0.slice(start..))
-        } else {
-            let end_idx = start_idx + molecule::NUMBER_SIZE;
-            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
-            SubValue::new_unchecked(self.0.slice(start..end))
-        }
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        SubValue::new_unchecked(self.0.slice(start..end))
     }
 
     pub fn as_reader<'r>(&'r self) -> SubValueVecReader<'r> {
@@ -1415,16 +1279,14 @@ impl<'r> ::core::fmt::Display for SubValueVecReader<'r> {
     }
 }
 impl<'r> SubValueVecReader<'r> {
+    pub const ITEM_SIZE: usize = 32;
+
     pub fn total_size(&self) -> usize {
-        molecule::unpack_number(self.as_slice()) as usize
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.item_count()
     }
 
     pub fn item_count(&self) -> usize {
-        if self.total_size() == molecule::NUMBER_SIZE {
-            0
-        } else {
-            (molecule::unpack_number(&self.as_slice()[molecule::NUMBER_SIZE..]) as usize / 4) - 1
-        }
+        molecule::unpack_number(self.as_slice()) as usize
     }
 
     pub fn len(&self) -> usize {
@@ -1444,16 +1306,9 @@ impl<'r> SubValueVecReader<'r> {
     }
 
     pub fn get_unchecked(&self, idx: usize) -> SubValueReader<'r> {
-        let slice = self.as_slice();
-        let start_idx = molecule::NUMBER_SIZE * (1 + idx);
-        let start = molecule::unpack_number(&slice[start_idx..]) as usize;
-        if idx == self.len() - 1 {
-            SubValueReader::new_unchecked(&self.as_slice()[start..])
-        } else {
-            let end_idx = start_idx + molecule::NUMBER_SIZE;
-            let end = molecule::unpack_number(&slice[end_idx..]) as usize;
-            SubValueReader::new_unchecked(&self.as_slice()[start..end])
-        }
+        let start = molecule::NUMBER_SIZE + Self::ITEM_SIZE * idx;
+        let end = start + Self::ITEM_SIZE;
+        SubValueReader::new_unchecked(&self.as_slice()[start..end])
     }
 }
 impl<'r> molecule::prelude::Reader<'r> for SubValueVecReader<'r> {
@@ -1473,46 +1328,22 @@ impl<'r> molecule::prelude::Reader<'r> for SubValueVecReader<'r> {
         self.0
     }
 
-    fn verify(slice: &[u8], compatible: bool) -> molecule::error::VerificationResult<()> {
+    fn verify(slice: &[u8], _compatible: bool) -> molecule::error::VerificationResult<()> {
         use molecule::verification_error as ve;
         let slice_len = slice.len();
         if slice_len < molecule::NUMBER_SIZE {
             return ve!(Self, HeaderIsBroken, molecule::NUMBER_SIZE, slice_len);
         }
-        let total_size = molecule::unpack_number(slice) as usize;
-        if slice_len != total_size {
-            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
-        }
-        if slice_len == molecule::NUMBER_SIZE {
+        let item_count = molecule::unpack_number(slice) as usize;
+        if item_count == 0 {
+            if slice_len != molecule::NUMBER_SIZE {
+                return ve!(Self, TotalSizeNotMatch, molecule::NUMBER_SIZE, slice_len);
+            }
             return Ok(());
         }
-        if slice_len < molecule::NUMBER_SIZE * 2 {
-            return ve!(
-                Self,
-                TotalSizeNotMatch,
-                molecule::NUMBER_SIZE * 2,
-                slice_len
-            );
-        }
-        let offset_first = molecule::unpack_number(&slice[molecule::NUMBER_SIZE..]) as usize;
-        if offset_first % molecule::NUMBER_SIZE != 0 || offset_first < molecule::NUMBER_SIZE * 2 {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        if slice_len < offset_first {
-            return ve!(Self, HeaderIsBroken, offset_first, slice_len);
-        }
-        let mut offsets: Vec<usize> = slice[molecule::NUMBER_SIZE..offset_first]
-            .chunks_exact(molecule::NUMBER_SIZE)
-            .map(|x| molecule::unpack_number(x) as usize)
-            .collect();
-        offsets.push(total_size);
-        if offsets.windows(2).any(|i| i[0] > i[1]) {
-            return ve!(Self, OffsetsNotMatch);
-        }
-        for pair in offsets.windows(2) {
-            let start = pair[0];
-            let end = pair[1];
-            SubValueReader::verify(&slice[start..end], compatible)?;
+        let total_size = molecule::NUMBER_SIZE + Self::ITEM_SIZE * item_count;
+        if slice_len != total_size {
+            return ve!(Self, TotalSizeNotMatch, total_size, slice_len);
         }
         Ok(())
     }
@@ -1520,6 +1351,8 @@ impl<'r> molecule::prelude::Reader<'r> for SubValueVecReader<'r> {
 #[derive(Debug, Default)]
 pub struct SubValueVecBuilder(pub(crate) Vec<SubValue>);
 impl SubValueVecBuilder {
+    pub const ITEM_SIZE: usize = 32;
+
     pub fn set(mut self, v: Vec<SubValue>) -> Self {
         self.0 = v;
         self
@@ -1549,38 +1382,13 @@ impl molecule::prelude::Builder for SubValueVecBuilder {
     const NAME: &'static str = "SubValueVecBuilder";
 
     fn expected_length(&self) -> usize {
-        molecule::NUMBER_SIZE * (self.0.len() + 1)
-            + self
-                .0
-                .iter()
-                .map(|inner| inner.as_slice().len())
-                .sum::<usize>()
+        molecule::NUMBER_SIZE + Self::ITEM_SIZE * self.0.len()
     }
 
     fn write<W: molecule::io::Write>(&self, writer: &mut W) -> molecule::io::Result<()> {
-        let item_count = self.0.len();
-        if item_count == 0 {
-            writer.write_all(&molecule::pack_number(
-                molecule::NUMBER_SIZE as molecule::Number,
-            ))?;
-        } else {
-            let (total_size, offsets) = self.0.iter().fold(
-                (
-                    molecule::NUMBER_SIZE * (item_count + 1),
-                    Vec::with_capacity(item_count),
-                ),
-                |(start, mut offsets), inner| {
-                    offsets.push(start);
-                    (start + inner.as_slice().len(), offsets)
-                },
-            );
-            writer.write_all(&molecule::pack_number(total_size as molecule::Number))?;
-            for offset in offsets.into_iter() {
-                writer.write_all(&molecule::pack_number(offset as molecule::Number))?;
-            }
-            for inner in self.0.iter() {
-                writer.write_all(inner.as_slice())?;
-            }
+        writer.write_all(&molecule::pack_number(self.0.len() as molecule::Number))?;
+        for inner in &self.0[..] {
+            writer.write_all(inner.as_slice())?;
         }
         Ok(())
     }
@@ -1675,7 +1483,7 @@ impl ::core::fmt::Display for SubKeyEntries {
 impl ::core::default::Default for SubKeyEntries {
     fn default() -> Self {
         let v: Vec<u8> = vec![
-            20, 0, 0, 0, 12, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 4, 0, 0, 0,
+            20, 0, 0, 0, 12, 0, 0, 0, 16, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         ];
         SubKeyEntries::new_unchecked(v.into())
     }

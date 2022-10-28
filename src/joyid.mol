@@ -8,7 +8,7 @@ struct SubKey {
   ext_data: Uint32, 
   reserved: Byte20,
 }
-table SubValue {
+struct SubValue {
   alg_index: Uint16,   
   pubkey_hash: Byte20,
   reserved: Byte9,
