@@ -6,7 +6,6 @@
 pub mod common;
 pub mod define;
 pub mod extension;
-pub mod joyid;
 pub mod mint;
 pub mod registry;
 pub mod smt;
