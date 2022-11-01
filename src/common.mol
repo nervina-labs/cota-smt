@@ -4,6 +4,7 @@
 array Uint16 [byte; 2];
 array Uint32 [byte; 4];
 array Uint64 [byte; 8];
+array Byte6 [byte; 6];
 array Byte32 [byte; 32];
 
 array CotaId [byte; 20];
