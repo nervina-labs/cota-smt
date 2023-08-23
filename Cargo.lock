@@ -44,9 +44,9 @@ dependencies = [
 
 [[package]]
 name = "buddy-alloc"
-version = "0.4.1"
+version = "0.5.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "8ff9f338986406db85e2b5deb40a9255b796ca03a194c7457403d215173f3fd5"
+checksum = "1f0d2da64a6a895d5a7e0724882825d50f83c13396b1b9f1878e19a024bab395"
 
 [[package]]
 name = "bytes"
@@ -181,24 +181,24 @@ dependencies = [
 
 [[package]]
 name = "ckb-standalone-types"
-version = "0.1.2"
+version = "0.1.4"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "22d7cbbdab96e6b809a102cf88bfec28795a0a3c06bfdea4abe4de89777801cd"
+checksum = "dd206470d9b270fe13f38c4c7fecabf323739f4930ea6f9b80e9490bfa750447"
 dependencies = [
+ "blake2b-ref 0.3.1",
  "cfg-if 1.0.0",
  "molecule",
 ]
 
 [[package]]
 name = "ckb-std"
-version = "0.10.0"
+version = "0.14.2"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "47a6ad40455c446ad6fbb303dae24827fc309f43558f59d1f1b863a9de3e9f81"
+checksum = "8e05fb8e44ea056a54666881031036c9f58301037bf43b11a8e820634ee93d4d"
 dependencies = [
  "buddy-alloc",
  "cc",
  "ckb-standalone-types",
- "cstr_core",
 ]
 
 [[package]]
@@ -225,7 +225,7 @@ dependencies = [
 
 [[package]]
 name = "cota-smt"
-version = "0.9.0"
+version = "0.10.0"
 dependencies = [
  "blake2b-ref 0.3.1",
  "cfg-if 1.0.0",
@@ -253,16 +253,6 @@ checksum = "d82cfc11ce7f2c3faef78d8a684447b40d503d9681acebed6cb728d45940c4db"
 dependencies = [
  "cfg-if 1.0.0",
  "lazy_static",
-]
-
-[[package]]
-name = "cstr_core"
-version = "0.2.6"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "dd98742e4fdca832d40cab219dc2e3048de17d873248f83f17df47c1bea70956"
-dependencies = [
- "cty",
- "memchr",
 ]
 
 [[package]]
@@ -319,12 +309,6 @@ name = "libc"
 version = "0.2.109"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "f98a04dce437184842841303488f70d0188c5f51437d2a834dc097eafa909a01"
-
-[[package]]
-name = "memchr"
-version = "2.5.0"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2dffe52ecf27772e601905b7522cb4ef790d2cc203488bbd0e2fe85fcb74566d"
 
 [[package]]
 name = "merkle-cbt"
