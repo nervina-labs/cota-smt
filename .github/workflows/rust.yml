@@ -13,7 +13,7 @@ jobs:
       - uses: actions-rs/toolchain@v1
         with:
           profile: minimal
-          toolchain: nightly-2023-04-20
+          toolchain: nightly-2023-06-13
           override: true
 
       - uses: docker-practice/actions-setup-docker@master
