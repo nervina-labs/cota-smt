@@ -219,13 +219,14 @@ dependencies = [
 
 [[package]]
 name = "ckb-std"
-version = "0.15.0"
+version = "0.15.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "457042d634fe7c19ce60f9fc0c95d1c4ca823cc99581d4edb009105bb0534127"
+checksum = "9357d9464ed36a8e542a7d588e894aff25ccb0cdd66221ac94e76bc69ca3ad55"
 dependencies = [
  "buddy-alloc",
  "cc",
  "ckb-gen-types 0.112.1",
+ "gcd",
 ]
 
 [[package]]
@@ -308,6 +309,12 @@ name = "faster-hex"
 version = "0.6.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "51e2ce894d53b295cf97b05685aa077950ff3e8541af83217fc720a6437169f8"
+
+[[package]]
+name = "gcd"
+version = "2.3.0"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "1d758ba1b47b00caf47f24925c0074ecb20d6dfcffe7f6d53395c0465674841a"
 
 [[package]]
 name = "getrandom"
